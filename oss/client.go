@@ -101,6 +101,28 @@ func (c *Client) PutObject(ctx context.Context, obj *Object) (*Object, error) {
 	return obj, err
 }
 
+func (c *Client) GetObject(ctx context.Context, metadata Metadata) (*Object, error) {
+	reader, err := c.client.GetObject(ctx, metadata.BucketName, metadata.RelativeFilePath(), minio.GetObjectOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	obj := &Object{
+		UserId:    metadata.UserID,
+		Bucket:    metadata.BucketName,
+		FileName:  metadata.ObjectName,
+		FileBytes: data,
+		FileSize:  int64(len(data)),
+	}
+	obj.Url = fmt.Sprintf("/%s/%s/%s", c.config.URL, obj.Bucket, metadata.RelativeFilePath())
+	return obj, err
+}
+
 func (c *Client) DeleteObject(ctx context.Context, metadata Metadata) error {
 	return c.client.RemoveObject(ctx, metadata.BucketName, fmt.Sprintf("%s/%s", metadata.UserID, metadata.ObjectName), minio.RemoveObjectOptions{})
 }

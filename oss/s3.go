@@ -74,6 +74,8 @@ type Oss interface {
 	URL(ctx context.Context, metadata Metadata) (string, error)
 	// PutObject puts the object to the oss.
 	PutObject(ctx context.Context, obj *Object) (*Object, error)
+	// GetObject get the object from the oss.
+	GetObject(ctx context.Context, metadata Metadata) (*Object, error)
 	// DeleteObject deletes the object.
 	DeleteObject(ctx context.Context, metadata Metadata) error
 	// ListObject list all object owned by this authenticated user.
