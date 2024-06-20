@@ -68,7 +68,7 @@ type Oss interface {
 	DeleteBucket(ctx context.Context, bucket string) error
 	// ListBuckets list all buckets owned by this authenticated user.
 	ListBuckets(ctx context.Context) ([]Bucket, error)
-	// SetBucketPolicy
+	// SetBucketPolicy sets the bucket policy.
 	SetBucketPolicy(ctx context.Context, bucket, policy string) error
 	// URL returns the url.
 	URL(ctx context.Context, metadata Metadata) (string, error)
