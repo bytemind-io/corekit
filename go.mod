@@ -1,4 +1,4 @@
-module corekit
+module github.com/bytemind-io/corekit
 
 go 1.22.3
 
