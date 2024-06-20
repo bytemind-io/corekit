@@ -3,6 +3,7 @@ module github.com/bytemind-io/corekit
 go 1.22.3
 
 require (
+	github.com/deepauto-io/filestype v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.71
 	github.com/zeromicro/go-zero v1.6.5
@@ -13,6 +14,7 @@ require (
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect

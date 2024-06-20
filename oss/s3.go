@@ -46,18 +46,27 @@ type Object struct {
 	Url         string    `json:"url"`
 }
 
+// UUID returns the uuid.
+func (obj Object) UUID() string {
+	s := fmt.Sprintf("%s/%s", obj.UserId, obj.FileName)
+	return s
+}
+
+func (obj Object) GetFileUrl(cfg Config) string {
+	switch cfg.Driver {
+	case DriverAliyun:
+		return fmt.Sprintf("%s/%s", cfg.URL, obj.UUID())
+	default:
+		return fmt.Sprintf("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
+	}
+}
+
 // Bucket container for bucket metadata.
 type Bucket struct {
 	// The name of the bucket.
 	Name string `json:"name"`
 	// Date the bucket was created.
 	CreationDate time.Time `json:"creationDate"`
-}
-
-// UUID returns the uuid.
-func (obj Object) UUID() string {
-	s := fmt.Sprintf("%s/%s", obj.UserId, obj.FileName)
-	return s
 }
 
 // Oss is the service for the s3.

@@ -8,6 +8,7 @@ import (
 type (
 	// Config represents the configuration for the oss service.
 	Config struct {
+		Driver          string `json:"driver" envconfig:"OSS_DRIVER"`
 		Region          string `json:"region" envconfig:"OSS_REGION"`
 		Bucket          string `json:"bucket" envconfig:"OSS_BUCKET"`
 		EndPoints       string `json:"endPoints" envconfig:"OSS_ENDPOINTS"`

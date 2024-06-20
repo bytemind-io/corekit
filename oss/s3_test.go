@@ -10,7 +10,7 @@ import (
 )
 
 func TestVultrPutObject(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -52,7 +52,7 @@ func TestVultrPutObject(t *testing.T) {
 }
 
 func TestVultrListObject(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -78,7 +78,7 @@ func TestVultrListObject(t *testing.T) {
 }
 
 func TestVultrDeleteObject(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -104,7 +104,7 @@ func TestVultrDeleteObject(t *testing.T) {
 }
 
 func TestVultrSize(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -130,7 +130,7 @@ func TestVultrSize(t *testing.T) {
 }
 
 func TestVultrClear(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -156,7 +156,7 @@ func TestVultrClear(t *testing.T) {
 }
 
 func TestVultrDownload(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -183,7 +183,7 @@ func TestVultrDownload(t *testing.T) {
 }
 
 func TestVultrCreateBucket(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -205,7 +205,7 @@ func TestVultrCreateBucket(t *testing.T) {
 }
 
 func TestVultrSetBucketPolicy(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -248,7 +248,7 @@ func TestVultrSetBucketPolicy(t *testing.T) {
 }
 
 func TestVultrURL(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Bucket:          "testtesttest",
 		EndPoints:       "Your EndPoints",
 		AccessKeyId:     "Your Access Key",
@@ -273,7 +273,7 @@ func TestVultrURL(t *testing.T) {
 }
 
 func TestMinIOPutObject(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -316,7 +316,7 @@ func TestMinIOPutObject(t *testing.T) {
 }
 
 func TestMinIOListObject(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -342,7 +342,7 @@ func TestMinIOListObject(t *testing.T) {
 }
 
 func TestMinIODeleteObject(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -368,7 +368,7 @@ func TestMinIODeleteObject(t *testing.T) {
 }
 
 func TestMinIOCreateBucket(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -390,7 +390,7 @@ func TestMinIOCreateBucket(t *testing.T) {
 }
 
 func TestMinIOSetBucketPolicy(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -434,7 +434,7 @@ func TestMinIOSetBucketPolicy(t *testing.T) {
 }
 
 func TestMinIOSize(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -461,7 +461,7 @@ func TestMinIOSize(t *testing.T) {
 }
 
 func TestMinIOClear(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -488,7 +488,7 @@ func TestMinIOClear(t *testing.T) {
 }
 
 func TestMinIODownload(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
@@ -516,7 +516,7 @@ func TestMinIODownload(t *testing.T) {
 }
 
 func TestMinIOURL(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		Region:          "us-east-1",
 		Bucket:          "test-test",
 		EndPoints:       "Your Endpoint",
