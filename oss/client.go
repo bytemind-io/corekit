@@ -35,7 +35,7 @@ type (
 )
 
 func newMinio(cfg Config) (Oss, error) {
-	client, err := minio.New(cfg.EndPoints, &minio.Options{
+	client, err := minio.New(cfg.EndPoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.AccessKeyId, cfg.AccessKeySecret, ""),
 		Region: cfg.Region,
 		Secure: cfg.Secure,
