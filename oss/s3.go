@@ -30,7 +30,7 @@ type Metadata struct {
 }
 
 func (m Metadata) RelativeFilePath() string {
-	return filepath.Join(m.BucketName, m.ObjectName)
+	return filepath.Join(m.UserID, m.ObjectName)
 }
 
 // Object is the object for the s3.
