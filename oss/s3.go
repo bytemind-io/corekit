@@ -18,6 +18,7 @@ package oss
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"time"
 )
@@ -55,9 +56,9 @@ func (obj Object) UUID() string {
 func (obj Object) GetFileUrl(cfg Config) string {
 	switch cfg.Driver {
 	case DriverAliyun:
-		return filepath.Join(cfg.URL, obj.UUID())
+		return fmt.Sprintf("%s/%s", cfg.URL, obj.UUID())
 	default:
-		return filepath.Join(cfg.URL, obj.Bucket, obj.UUID())
+		return fmt.Sprintf("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
 	}
 }
 
