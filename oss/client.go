@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/deepauto-io/filestype"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"io"
@@ -109,7 +109,7 @@ func (c *Client) PutObject(ctx context.Context, obj *Object) (*Object, error) {
 		obj.Bucket = c.config.Bucket
 	}
 	if obj.ContentType == "" {
-		obj.ContentType = filestype.DetectFileType(obj.FileBytes)
+		obj.ContentType = mimetype.Detect(obj.FileBytes).String()
 	}
 	objectId := obj.UUID()
 	_, err := c.client.PutObject(ctx, obj.Bucket, objectId, bytes.NewReader(obj.FileBytes), obj.FileSize, minio.PutObjectOptions{
@@ -150,7 +150,7 @@ func (c *Client) GetObject(ctx context.Context, metadata Metadata) (*Object, err
 		FileName:    metadata.ObjectName,
 		FileBytes:   data,
 		FileSize:    int64(len(data)),
-		ContentType: filestype.DetectFileType(data),
+		ContentType: mimetype.Detect(data).String(),
 	}
 	obj.Url = obj.GetFileUrl(c.config)
 	return obj, err

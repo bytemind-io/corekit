@@ -541,3 +541,8 @@ func TestMinIOURL(t *testing.T) {
 		t.Log(str)
 	}
 }
+
+func TestMustLoadConfig(t *testing.T) {
+	cfg := MustLoadConfig("")
+	t.Log(cfg)
+}
