@@ -48,16 +48,16 @@ type Object struct {
 
 // UUID returns the uuid.
 func (obj Object) UUID() string {
-	s := filepath.Join("%s/%s", obj.UserId, obj.FileName)
+	s := filepath.Join(obj.UserId, obj.FileName)
 	return s
 }
 
 func (obj Object) GetFileUrl(cfg Config) string {
 	switch cfg.Driver {
 	case DriverAliyun:
-		return filepath.Join("%s/%s", cfg.URL, obj.UUID())
+		return filepath.Join(cfg.URL, obj.UUID())
 	default:
-		return filepath.Join("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
+		return filepath.Join(cfg.URL, obj.Bucket, obj.UUID())
 	}
 }
 
