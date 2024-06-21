@@ -112,13 +112,21 @@ func (c *Client) PutObject(ctx context.Context, obj *Object) (*Object, error) {
 		obj.ContentType = mimetype.Detect(obj.FileBytes).String()
 	}
 	objectId := obj.UUID()
-	_, err := c.client.PutObject(ctx, obj.Bucket, objectId, bytes.NewReader(obj.FileBytes), obj.FileSize, minio.PutObjectOptions{
+
+	opts := minio.PutObjectOptions{
 		ContentType:        obj.ContentType,
 		ContentDisposition: "inline",
-		UserTags: map[string]string{
+	}
+	if c.config.Driver == DriverAliyun {
+		opts.Header().Set("x-oss-object-acl", "public-read")
+		opts.Header().Set("x-oss-tagging", "UserID="+obj.UserId)
+	} else {
+		opts.UserTags = map[string]string{
 			"UserID": obj.UserId,
-		},
-	})
+		}
+		opts.UserMetadata = map[string]string{"x-amz-acl": "public-read"}
+	}
+	_, err := c.client.PutObject(ctx, obj.Bucket, objectId, bytes.NewReader(obj.FileBytes), obj.FileSize, opts)
 	if err != nil {
 		return obj, err
 	}
@@ -134,6 +142,7 @@ func (c *Client) GetObject(ctx context.Context, metadata Metadata) (*Object, err
 	if err != nil {
 		return nil, err
 	}
+	defer reader.Close()
 
 	data, err := io.ReadAll(reader)
 	if err != nil {

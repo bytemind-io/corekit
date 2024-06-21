@@ -18,7 +18,7 @@ package oss
 
 import (
 	"context"
-	"fmt"
+	"path/filepath"
 	"time"
 )
 
@@ -30,7 +30,7 @@ type Metadata struct {
 }
 
 func (m Metadata) RelativeFilePath() string {
-	return fmt.Sprintf("%s/%s", m.UserID, m.ObjectName)
+	return filepath.Join(m.BucketName, m.ObjectName)
 }
 
 // Object is the object for the s3.
@@ -48,16 +48,16 @@ type Object struct {
 
 // UUID returns the uuid.
 func (obj Object) UUID() string {
-	s := fmt.Sprintf("%s/%s", obj.UserId, obj.FileName)
+	s := filepath.Join("%s/%s", obj.UserId, obj.FileName)
 	return s
 }
 
 func (obj Object) GetFileUrl(cfg Config) string {
 	switch cfg.Driver {
 	case DriverAliyun:
-		return fmt.Sprintf("%s/%s", cfg.URL, obj.UUID())
+		return filepath.Join("%s/%s", cfg.URL, obj.UUID())
 	default:
-		return fmt.Sprintf("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
+		return filepath.Join("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
 	}
 }
 
