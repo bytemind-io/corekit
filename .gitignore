@@ -26,6 +26,8 @@ test
 logs
 certs
 
+*_test.go
+
 # MacOS
 .DS_Store
 *.dat

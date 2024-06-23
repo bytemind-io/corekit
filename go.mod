@@ -3,6 +3,8 @@ module github.com/bytemind-io/corekit
 go 1.22.3
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.71
 	github.com/zeromicro/go-zero v1.6.5

@@ -19,6 +19,7 @@ package oss
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"time"
 )
 
@@ -30,7 +31,7 @@ type Metadata struct {
 }
 
 func (m Metadata) RelativeFilePath() string {
-	return fmt.Sprintf("%s/%s", m.UserID, m.ObjectName)
+	return filepath.Join(m.UserID, m.ObjectName)
 }
 
 // Object is the object for the s3.
@@ -46,18 +47,27 @@ type Object struct {
 	Url         string    `json:"url"`
 }
 
+// UUID returns the uuid.
+func (obj Object) UUID() string {
+	s := filepath.Join(obj.UserId, obj.FileName)
+	return s
+}
+
+func (obj Object) GetFileUrl(cfg Config) string {
+	switch cfg.Driver {
+	case DriverAliyun:
+		return fmt.Sprintf("%s/%s", cfg.URL, obj.UUID())
+	default:
+		return fmt.Sprintf("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
+	}
+}
+
 // Bucket container for bucket metadata.
 type Bucket struct {
 	// The name of the bucket.
 	Name string `json:"name"`
 	// Date the bucket was created.
 	CreationDate time.Time `json:"creationDate"`
-}
-
-// UUID returns the uuid.
-func (obj Object) UUID() string {
-	s := fmt.Sprintf("%s/%s", obj.UserId, obj.FileName)
-	return s
 }
 
 // Oss is the service for the s3.
@@ -74,6 +84,8 @@ type Oss interface {
 	URL(ctx context.Context, metadata Metadata) (string, error)
 	// PutObject puts the object to the oss.
 	PutObject(ctx context.Context, obj *Object) (*Object, error)
+	// GetObject get the object from the oss.
+	GetObject(ctx context.Context, metadata Metadata) (*Object, error)
 	// DeleteObject deletes the object.
 	DeleteObject(ctx context.Context, metadata Metadata) error
 	// ListObject list all object owned by this authenticated user.
