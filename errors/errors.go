@@ -35,6 +35,14 @@ type ErrBody struct {
 func Err(w http.ResponseWriter, err error) {
 	stu, ok := status.FromError(err)
 	if ok {
+		if stu.Code() < 400 {
+			httpx.WriteJson(w, http.StatusInternalServerError, ErrBody{
+				Code: fmt.Sprintf("%d", http.StatusInternalServerError),
+				Msg:  stu.Message(),
+			})
+			return
+		}
+
 		httpx.WriteJson(w, int(stu.Code()), ErrBody{
 			Code: fmt.Sprintf("%d", stu.Code()),
 			Msg:  stu.Message(),
