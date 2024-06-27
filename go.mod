@@ -7,12 +7,16 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.71
+	github.com/pkoukk/tiktoken-go v0.1.7
+	github.com/sashabaranov/go-openai v1.26.1
 	github.com/zeromicro/go-zero v1.6.5
 	github.com/zeromicro/x v0.0.0-20240408115609-8224c482b07e
+	golang.org/x/image v0.18.0
 	google.golang.org/grpc v1.64.0
 )
 
 require (
+	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
@@ -32,7 +36,7 @@ require (
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
