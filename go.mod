@@ -4,7 +4,7 @@ go 1.22.3
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/deepauto-io/filestype v1.0.0
+	github.com/deepauto-io/filestype v0.0.0-20231217053401-a7e90f2e6b3c
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.71
