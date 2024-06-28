@@ -19,6 +19,7 @@ package oss
 import (
 	"context"
 	"fmt"
+	"github.com/minio/minio-go/v7"
 	"io"
 	"path/filepath"
 	"time"
@@ -26,9 +27,12 @@ import (
 
 // Metadata is the metadata for the s3.
 type Metadata struct {
-	BucketName string
-	ObjectName string
-	UserID     string
+	BucketName    string
+	ObjectName    string
+	UserID        string
+	GetObjOpts    *minio.GetObjectOptions
+	ListObjOpts   *minio.ListObjectsOptions
+	RemoveObjOpts *minio.RemoveObjectOptions
 }
 
 func (m Metadata) RelativeFilePath() string {
@@ -116,6 +120,8 @@ type Oss interface {
 	PutObjectReader(ctx context.Context, obj *ObjectReader) (*ObjectReader, error)
 	// GetObject get the object from the oss.
 	GetObject(ctx context.Context, metadata Metadata) (*Object, error)
+	// GetObjectReader get the object reader from oss
+	GetObjectReader(ctx context.Context, metadata Metadata) (*ObjectReader, error)
 	// DeleteObject deletes the object.
 	DeleteObject(ctx context.Context, metadata Metadata) error
 	// ListObject list all object owned by this authenticated user.

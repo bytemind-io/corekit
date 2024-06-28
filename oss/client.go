@@ -175,7 +175,14 @@ func (c *Client) GetObject(ctx context.Context, metadata Metadata) (*Object, err
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
 	}
-	reader, err := c.client.GetObject(ctx, metadata.BucketName, metadata.RelativeFilePath(), minio.GetObjectOptions{})
+	var getObjOpts minio.GetObjectOptions
+	if metadata.GetObjOpts == nil {
+		getObjOpts = minio.GetObjectOptions{}
+	} else {
+		getObjOpts = *metadata.GetObjOpts
+	}
+
+	reader, err := c.client.GetObject(ctx, metadata.BucketName, metadata.RelativeFilePath(), getObjOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -202,6 +209,57 @@ func (c *Client) GetObject(ctx context.Context, metadata Metadata) (*Object, err
 	return obj, err
 }
 
+func (c *Client) GetObjectReader(ctx context.Context, metadata Metadata) (*ObjectReader, error) {
+	if metadata.BucketName == "" {
+		metadata.BucketName = c.config.Bucket
+	}
+	var getObjOpts minio.GetObjectOptions
+	if metadata.GetObjOpts == nil {
+		getObjOpts = minio.GetObjectOptions{}
+	} else {
+		getObjOpts = *metadata.GetObjOpts
+	}
+
+	reader, err := c.client.GetObject(ctx, metadata.BucketName, metadata.RelativeFilePath(), getObjOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileSize int64
+	if _, err := reader.Seek(0, io.SeekEnd); err != nil {
+		return nil, err
+	}
+	if stat, err := reader.Stat(); err != nil {
+		return nil, err
+	} else {
+		fileSize = stat.Size
+	}
+
+	if _, err := reader.Seek(0, io.SeekStart); err != nil {
+		return nil, err
+	}
+
+	var detectReaderMime *mimetype.MIME
+	if detectReaderMime, err = mimetype.DetectReader(reader); err != nil {
+		return nil, err
+	}
+
+	if _, err := reader.Seek(0, io.SeekStart); err != nil {
+		return nil, err
+	}
+
+	obj := &ObjectReader{
+		UserId:      metadata.UserID,
+		Bucket:      metadata.BucketName,
+		FileName:    metadata.ObjectName,
+		Reader:      reader,
+		FileSize:    fileSize,
+		ContentType: detectReaderMime.String(),
+	}
+	obj.Url = obj.GetFileUrl(c.config)
+	return obj, err
+}
+
 func (c *Client) DeleteObject(ctx context.Context, metadata Metadata) error {
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
@@ -213,10 +271,16 @@ func (c *Client) ListObject(ctx context.Context, metadata Metadata) ([]Object, e
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
 	}
-	objectCh := c.client.ListObjects(ctx, metadata.BucketName, minio.ListObjectsOptions{
-		Prefix:    metadata.UserID + "/",
-		Recursive: true,
-	})
+	var listObjOpts minio.ListObjectsOptions
+	if metadata.ListObjOpts == nil {
+		listObjOpts = minio.ListObjectsOptions{
+			Prefix:    metadata.UserID + "/",
+			Recursive: true,
+		}
+	} else {
+		listObjOpts = *metadata.ListObjOpts
+	}
+	objectCh := c.client.ListObjects(ctx, metadata.BucketName, listObjOpts)
 	objectList := make([]Object, 0)
 	for object := range objectCh {
 		if object.Err != nil {
@@ -239,16 +303,29 @@ func (c *Client) Clear(ctx context.Context, metadata Metadata) error {
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
 	}
-	objectCh := c.client.ListObjects(ctx, metadata.BucketName, minio.ListObjectsOptions{
-		Prefix:    metadata.UserID + "/",
-		Recursive: true,
-	})
+	var listObjOpts minio.ListObjectsOptions
+	if metadata.ListObjOpts == nil {
+		listObjOpts = minio.ListObjectsOptions{
+			Prefix:    metadata.UserID + "/",
+			Recursive: true,
+		}
+	} else {
+		listObjOpts = *metadata.ListObjOpts
+	}
+	objectCh := c.client.ListObjects(ctx, metadata.BucketName, listObjOpts)
+
+	var removeObjOpts minio.RemoveObjectOptions
+	if metadata.RemoveObjOpts == nil {
+		removeObjOpts = minio.RemoveObjectOptions{}
+	} else {
+		removeObjOpts = *metadata.RemoveObjOpts
+	}
 
 	for object := range objectCh {
 		if object.Err != nil {
 			return object.Err
 		}
-		err := c.client.RemoveObject(ctx, metadata.BucketName, object.Key, minio.RemoveObjectOptions{})
+		err := c.client.RemoveObject(ctx, metadata.BucketName, object.Key, removeObjOpts)
 		if err != nil {
 			return err
 		}
@@ -260,7 +337,13 @@ func (c *Client) Download(ctx context.Context, metadata Metadata) ([]byte, error
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
 	}
-	reader, err := c.client.GetObject(ctx, metadata.BucketName, metadata.RelativeFilePath(), minio.GetObjectOptions{})
+	var getObjOpts minio.GetObjectOptions
+	if metadata.GetObjOpts == nil {
+		getObjOpts = minio.GetObjectOptions{}
+	} else {
+		getObjOpts = *metadata.GetObjOpts
+	}
+	reader, err := c.client.GetObject(ctx, metadata.BucketName, metadata.RelativeFilePath(), getObjOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -277,10 +360,16 @@ func (c *Client) Size(ctx context.Context, metadata Metadata) (int64, error) {
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
 	}
-	objectCh := c.client.ListObjects(ctx, metadata.BucketName, minio.ListObjectsOptions{
-		Prefix:    metadata.UserID + "/",
-		Recursive: true,
-	})
+	var listObjOpts minio.ListObjectsOptions
+	if metadata.ListObjOpts == nil {
+		listObjOpts = minio.ListObjectsOptions{
+			Prefix:    metadata.UserID + "/",
+			Recursive: true,
+		}
+	} else {
+		listObjOpts = *metadata.ListObjOpts
+	}
+	objectCh := c.client.ListObjects(ctx, metadata.BucketName, listObjOpts)
 
 	var totalSize int64
 	for object := range objectCh {
