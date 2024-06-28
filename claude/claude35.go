@@ -35,8 +35,8 @@ type ClaudeRequest struct {
 	TopK              float64     `json:"top_k"`
 }
 
-// ChatCompletion is the request for chat. https://docs.anthropic.com/claude/reference/messages_post
-func ChatCompletion(r openai.ChatCompletionRequest) *ClaudeRequest {
+// OpenaiConvertClaude is the request for chat. https://docs.anthropic.com/claude/reference/messages_post
+func OpenaiConvertClaude(r openai.ChatCompletionRequest) *ClaudeRequest {
 	req := &ClaudeRequest{
 		Model:     r.Model,
 		Stream:    r.Stream,

@@ -34,8 +34,8 @@ type BedrockRequest struct {
 	TopP              float32  `json:"top_p,omitempty"`
 }
 
-// Sonnet is the sonnet.TODO only use in Charlie W. Johnson.
-func Sonnet(in openai.ChatCompletionRequest) (*BedrockRequest, error) {
+// OpenaiConvertSonnet is the sonnet.TODO only use in Charlie W. Johnson.
+func OpenaiConvertSonnet(in openai.ChatCompletionRequest) (*BedrockRequest, error) {
 	version, ok := AnthropicVersion[in.Model]
 	if !ok {
 		return nil, fmt.Errorf("model %s not found.(Aws Anthropic Version)", in.Model)
