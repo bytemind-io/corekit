@@ -19,6 +19,7 @@ package oss
 import (
 	"context"
 	"fmt"
+	"io"
 	"path/filepath"
 	"time"
 )
@@ -62,6 +63,33 @@ func (obj Object) GetFileUrl(cfg Config) string {
 	}
 }
 
+type ObjectReader struct {
+	UserId      string    `json:"user_id"`
+	Bucket      string    `json:"bucket"`
+	FileName    string    `json:"file_name"`
+	Reader      io.Reader `json:"reader"`
+	FileSize    int64     `json:"file_size"`
+	ContentType string    `json:"content_type"`
+	VersionId   string    `json:"version_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Url         string    `json:"url"`
+}
+
+// UUID returns the uuid.
+func (obj ObjectReader) UUID() string {
+	s := filepath.Join(obj.UserId, obj.FileName)
+	return s
+}
+
+func (obj ObjectReader) GetFileUrl(cfg Config) string {
+	switch cfg.Driver {
+	case DriverAliyun:
+		return fmt.Sprintf("%s/%s", cfg.URL, obj.UUID())
+	default:
+		return fmt.Sprintf("%s/%s/%s", cfg.URL, obj.Bucket, obj.UUID())
+	}
+}
+
 // Bucket container for bucket metadata.
 type Bucket struct {
 	// The name of the bucket.
@@ -84,6 +112,8 @@ type Oss interface {
 	URL(ctx context.Context, metadata Metadata) (string, error)
 	// PutObject puts the object to the oss.
 	PutObject(ctx context.Context, obj *Object) (*Object, error)
+	// PutObjectReader puts the object reader to the oss.
+	PutObjectReader(ctx context.Context, obj *ObjectReader) (*ObjectReader, error)
 	// GetObject get the object from the oss.
 	GetObject(ctx context.Context, metadata Metadata) (*Object, error)
 	// DeleteObject deletes the object.

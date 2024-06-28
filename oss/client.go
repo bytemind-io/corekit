@@ -134,6 +134,43 @@ func (c *Client) PutObject(ctx context.Context, obj *Object) (*Object, error) {
 	return obj, err
 }
 
+func (c *Client) PutObjectReader(ctx context.Context, obj *ObjectReader) (*ObjectReader, error) {
+	if obj == nil {
+		return nil, nil
+	}
+	if obj.Bucket == "" {
+		obj.Bucket = c.config.Bucket
+	}
+	if obj.ContentType == "" {
+		if mime, err := mimetype.DetectReader(obj.Reader); err != nil {
+			return nil, err
+		} else {
+			obj.ContentType = mime.String()
+		}
+	}
+	objectId := obj.UUID()
+
+	opts := minio.PutObjectOptions{
+		ContentType:        obj.ContentType,
+		ContentDisposition: "inline",
+	}
+	if c.config.Driver == DriverAliyun {
+		opts.Header().Set("x-oss-object-acl", "public-read")
+		opts.Header().Set("x-oss-tagging", "UserID="+obj.UserId)
+	} else {
+		opts.UserTags = map[string]string{
+			"UserID": obj.UserId,
+		}
+		opts.UserMetadata = map[string]string{"x-amz-acl": "public-read"}
+	}
+	_, err := c.client.PutObject(ctx, obj.Bucket, objectId, obj.Reader, obj.FileSize, opts)
+	if err != nil {
+		return obj, err
+	}
+	obj.Url = obj.GetFileUrl(c.config)
+	return obj, err
+}
+
 func (c *Client) GetObject(ctx context.Context, metadata Metadata) (*Object, error) {
 	if metadata.BucketName == "" {
 		metadata.BucketName = c.config.Bucket
