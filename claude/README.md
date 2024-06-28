@@ -1,4 +1,4 @@
 # claude
 
-- web: 对应web请求格式
-- api: 对应oai的标准请求格式.
+- bedrock: 对应亚马逊请求格式
+- claude35: 对应claude官网的标准请求格式.

@@ -16,6 +16,11 @@ limitations under the License.
 
 package claude
 
+import (
+	"github.com/bytemind-io/corekit/openai"
+	"github.com/spf13/cast"
+)
+
 // ClaudeRequest is the request for chat. https://docs.anthropic.com/claude/reference/messages_post
 // claude3.5 [官网](https://docs.anthropic.com/claude/reference/messages_post)
 type ClaudeRequest struct {
@@ -28,4 +33,48 @@ type ClaudeRequest struct {
 	Temperature       float64     `json:"temperature"`
 	TopP              float64     `json:"top_p"`
 	TopK              float64     `json:"top_k"`
+}
+
+// ChatCompletion is the request for chat. https://docs.anthropic.com/claude/reference/messages_post
+func ChatCompletion(r openai.ChatCompletionRequest) *ClaudeRequest {
+	req := &ClaudeRequest{
+		Model:     r.Model,
+		Stream:    r.Stream,
+		MaxTokens: r.MaxTokens,
+	}
+
+	for _, message := range r.Messages {
+		if len(message.Parts) != 0 {
+			var contents Contents
+			for _, part := range message.Parts {
+				contents = append(contents, Content{
+					Type: "image",
+					Source: &Source{
+						Type:      "base64",
+						MediaType: part.MimeType,
+						Data:      part.ImageData,
+					},
+				})
+			}
+
+			contents = append(contents, Content{
+				Type: "text",
+				Text: cast.ToString(message.Content),
+			})
+
+			req.Messages = append(req.Messages, Message{
+				Role:    message.Role,
+				Content: contents,
+			})
+			return req
+		}
+	}
+
+	for _, message := range r.Messages {
+		req.Messages = append(req.Messages, Message{
+			Role:    message.Role,
+			Content: message.Content,
+		})
+	}
+	return req
 }
