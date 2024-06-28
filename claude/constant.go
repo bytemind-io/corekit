@@ -14,23 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package conf
+package claude
 
-import (
-	"github.com/kelseyhightower/envconfig"
-	"github.com/zeromicro/go-zero/core/conf"
-)
-
-// Load loads configuration from file.
-func Load(file string, v any, df func(v any), opts ...conf.Option) error {
-	if err := conf.Load(file, &v, opts...); err != nil {
-		return err
-	}
-	// Load configuration from environment variables.
-	if err := envconfig.Process("", &v); err != nil {
-		return err
-	}
-
-	df(&v)
-	return nil
+// AnthropicVersion is a map of model names to their corresponding bedrock model names.
+// This is used to map claude models to bedrock models.[use in aws]
+var AnthropicVersion = map[string]string{
+	"anthropic.claude-3-5-sonnet-20240620-v1:0": "bedrock-2023-05-31",
+	"anthropic.claude-3-sonnet-20240229-v1:0":   "bedrock-2023-05-31",
+	"anthropic.claude-3-haiku-20240307-v1:0":    "bedrock-2023-05-31",
 }
