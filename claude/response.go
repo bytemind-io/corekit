@@ -67,7 +67,7 @@ func (r *ClaudeResponse) OpenAIWeb(in *openai.ChatCompletionRequest) (list []ope
 }
 
 func (r *ClaudeResponse) Openai() sysopenai.ChatCompletionResponse {
-	return sysopenai.ChatCompletionResponse{
+	req := sysopenai.ChatCompletionResponse{
 		ID:      r.Id,
 		Object:  "chat.completion.chunk",
 		Created: time.Now().Unix(),
@@ -89,4 +89,9 @@ func (r *ClaudeResponse) Openai() sysopenai.ChatCompletionResponse {
 		},
 		SystemFingerprint: "fp_" + uuid.NewString(),
 	}
+
+	req.Usage.PromptTokens = 0
+	req.Usage.CompletionTokens = 0
+	req.Usage.TotalTokens = 0
+	return req
 }
