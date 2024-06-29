@@ -29,11 +29,11 @@ import (
 type ClaudeResponse struct {
 	Type         string      `json:"type"`
 	Index        int         `json:"index"`
-	Delta        Content     `json:"delta"`
+	Delta        Content     `json:"delta,omitempty"`
 	Id           string      `json:"id"`
 	Role         string      `json:"role"`
 	Model        string      `json:"model"`
-	Content      []Content   `json:"content"`
+	Content      []Content   `json:"content,omitempty"`
 	StopReason   string      `json:"stop_reason"`
 	StopSequence interface{} `json:"stop_sequence"`
 }
