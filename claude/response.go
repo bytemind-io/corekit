@@ -82,14 +82,10 @@ func (r *ClaudeResponse) Openai() sysopenai.ChatCompletionResponse {
 				FinishReason: sysopenai.FinishReason(r.StopReason),
 			},
 		},
-		Usage: sysopenai.Usage{
-			PromptTokens:     0,
-			CompletionTokens: 0,
-			TotalTokens:      0,
-		},
 		SystemFingerprint: "fp_" + uuid.NewString(),
 	}
 
+	// TODO add token cal
 	req.Usage.PromptTokens = 0
 	req.Usage.CompletionTokens = 0
 	req.Usage.TotalTokens = 0
