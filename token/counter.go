@@ -31,36 +31,80 @@ import (
 )
 
 var (
-	tokenMap     = map[string]*tiktoken.Tiktoken{}
-	defaultToken *tiktoken.Tiktoken
-	cl200kToken  *tiktoken.Tiktoken
+	tokenMap      = map[string]*tiktoken.Tiktoken{}
+	defaultToken  *tiktoken.Tiktoken
+	cl100kToken   *tiktoken.Tiktoken
+	o200kToken    *tiktoken.Tiktoken
+	p50kToken     *tiktoken.Tiktoken
+	p50kEditToken *tiktoken.Tiktoken
+	r50kToken     *tiktoken.Tiktoken
 )
 
 func init() {
-	gpt35Token, err := tiktoken.EncodingForModel("gpt-3.5-turbo")
+	token, err := tiktoken.GetEncoding(tiktoken.MODEL_CL100K_BASE)
 	if err != nil {
 		panic(err)
 	}
-	defaultToken = gpt35Token
+	cl100kToken = token
+	defaultToken = cl100kToken
 
-	gpt4Token, err := tiktoken.EncodingForModel("gpt-4")
+	token, err = tiktoken.GetEncoding(tiktoken.MODEL_O200K_BASE)
 	if err != nil {
 		panic(err)
 	}
-	cl200kToken, err = tiktoken.EncodingForModel("gpt-4o")
+	o200kToken = token
 
-	for model, _ := range defaultModelRatio {
-		if strings.HasPrefix(model, "gpt-3.5") {
-			tokenMap[model] = gpt35Token
-		} else if strings.HasPrefix(model, "gpt-4") {
-			if strings.HasPrefix(model, "gpt-4o") {
-				tokenMap[model] = cl200kToken
-			} else {
-				tokenMap[model] = gpt4Token
-			}
-		} else {
-			// TODO: set null token may be in the future
+	token, err = tiktoken.GetEncoding(tiktoken.MODEL_P50K_BASE)
+	if err != nil {
+		panic(err)
+	}
+	p50kToken = token
+
+	token, err = tiktoken.GetEncoding(tiktoken.MODEL_P50K_EDIT)
+	if err != nil {
+		panic(err)
+	}
+	p50kEditToken = token
+
+	token, err = tiktoken.GetEncoding(tiktoken.MODEL_R50K_BASE)
+	if err != nil {
+		panic(err)
+	}
+	r50kToken = token
+
+	//预设的模型编码
+	for model, encoding := range tiktoken.MODEL_TO_ENCODING {
+		switch encoding {
+		case tiktoken.MODEL_CL100K_BASE:
+			tokenMap[model] = cl100kToken
+		case tiktoken.MODEL_O200K_BASE:
+			tokenMap[model] = o200kToken
+		case tiktoken.MODEL_P50K_BASE:
+			tokenMap[model] = p50kToken
+		case tiktoken.MODEL_P50K_EDIT:
+			tokenMap[model] = p50kEditToken
+		case tiktoken.MODEL_R50K_BASE:
+			tokenMap[model] = r50kToken
+		default:
 			tokenMap[model] = defaultToken
+		}
+	}
+
+	//自定义的模型编码
+	for model, encoding := range ModelToEncoding {
+		switch encoding {
+		case tiktoken.MODEL_CL100K_BASE:
+			tokenMap[model] = cl100kToken
+		case tiktoken.MODEL_O200K_BASE:
+			tokenMap[model] = o200kToken
+		case tiktoken.MODEL_P50K_BASE:
+			tokenMap[model] = p50kToken
+		case tiktoken.MODEL_P50K_EDIT:
+			tokenMap[model] = p50kEditToken
+		case tiktoken.MODEL_R50K_BASE:
+			tokenMap[model] = r50kToken
+		default:
+			tokenMap[model] = cl100kToken
 		}
 	}
 }
@@ -68,7 +112,7 @@ func init() {
 // getModelDefaultTokenEncoder returns the default token encoder for the given model.
 func getModelDefaultTokenEncoder(model string) *tiktoken.Tiktoken {
 	if strings.HasPrefix(model, "gpt-4o") {
-		return cl200kToken
+		return o200kToken
 	}
 	return defaultToken
 }
@@ -76,24 +120,23 @@ func getModelDefaultTokenEncoder(model string) *tiktoken.Tiktoken {
 // getTokenEncoder returns the token encoder for the given model.
 func getTokenEncoder(model string) *tiktoken.Tiktoken {
 	tokenEncoder, ok := tokenMap[model]
-	if ok && tokenEncoder != nil {
-		return tokenEncoder
-	}
-	if ok {
+	if !ok {
 		tokenEncoder, err := tiktoken.EncodingForModel(model)
 		if err != nil {
 			tokenEncoder = getModelDefaultTokenEncoder(model)
+			return tokenEncoder
 		}
 		tokenMap[model] = tokenEncoder
 		return tokenEncoder
 	}
-	return getModelDefaultTokenEncoder(model)
+
+	return tokenEncoder
 }
 
-// CalculaRequestToken calculates the chat token for the given model.[请求相关]
-func CalculaRequestToken(in openai.ChatCompletionRequest, model string) (int, error) {
+// CalculateRequestToken calculates the chat token for the given model.[请求相关]
+func CalculateRequestToken(in openai.ChatCompletionRequest, model string) (int, error) {
 	tkm := 0
-	msgTokens, err := CalculaMessage(in.Messages, model)
+	msgTokens, err := CalculateMessage(in.Messages, model)
 	if err != nil {
 		return 0, err
 	}
@@ -116,7 +159,7 @@ func CalculaRequestToken(in openai.ChatCompletionRequest, model string) (int, er
 				countStr += fmt.Sprintf("%v", tool.Function.Parameters)
 			}
 		}
-		toolTokens, err := CalculaTextToken(countStr, model)
+		toolTokens, err := CalculateTextToken(countStr, model)
 		if err != nil {
 			return 0, err
 		}
@@ -126,10 +169,10 @@ func CalculaRequestToken(in openai.ChatCompletionRequest, model string) (int, er
 	return tkm, nil
 }
 
-// CalculaMessage calculates the chat token for the given model.[消息Token计算]
+// CalculateteMessage calculates the chat token for the given model.[消息Token计算]
 // https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
 // https://github.com/pkoukk/tiktoken-go/issues/6
-func CalculaMessage(messages []openai.ChatCompletionMessage, model string) (int, error) {
+func CalculateMessage(messages []openai.ChatCompletionMessage, model string) (int, error) {
 	tokenEncoder := getTokenEncoder(model)
 	var (
 		tokensPerMessage int
@@ -160,7 +203,7 @@ func CalculaMessage(messages []openai.ChatCompletionMessage, model string) (int,
 				arrayContent := message.MultiContent
 				for _, m := range arrayContent {
 					if m.Type == openai.ChatMessagePartTypeImageURL {
-						imageTokenNum, err := CalculaImageToken(m.ImageURL, model)
+						imageTokenNum, err := CalculateImageToken(m.ImageURL, model)
 						if err != nil {
 							return 0, err
 						}
@@ -177,8 +220,8 @@ func CalculaMessage(messages []openai.ChatCompletionMessage, model string) (int,
 	return tokenNum, nil
 }
 
-// CalculaImageToken gets the token number for the given image URL.[计算图片Token]
-func CalculaImageToken(imageUrl *openai.ChatMessageImageURL, model string) (int, error) {
+// CalculateImageToken gets the token number for the given image URL.[计算图片Token]
+func CalculateImageToken(imageUrl *openai.ChatMessageImageURL, model string) (int, error) {
 	if model == "glm-4v" {
 		return 1047, nil
 	}
@@ -222,8 +265,8 @@ func CalculaImageToken(imageUrl *openai.ChatMessageImageURL, model string) (int,
 	return tiles*170 + 85, nil
 }
 
-// CalculaTextToken calculates the chat token for the given model.[文本Token计算]
-func CalculaTextToken(in interface{}, model string) (int, error) {
+// CalculateTextToken calculates the chat token for the given model.[文本Token计算]
+func CalculateTextToken(in interface{}, model string) (int, error) {
 	switch v := in.(type) {
 	case string:
 		return CounterText(v, model)
@@ -234,11 +277,11 @@ func CalculaTextToken(in interface{}, model string) (int, error) {
 		}
 		return CounterText(text, model)
 	}
-	return CalculaTextToken(fmt.Sprintf("%v", in), model)
+	return CalculateTextToken(fmt.Sprintf("%v", in), model)
 }
 
-// CalculaAudioToken calculates the chat token for the given model.[音频Token计算]
-func CalculaAudioToken(text, model string) (int, error) {
+// CalculateAudioToken calculates the chat token for the given model.[音频Token计算]
+func CalculateAudioToken(text, model string) (int, error) {
 	if strings.HasPrefix(model, "tts") {
 		return utf8.RuneCountInString(text), nil
 	} else {
