@@ -14,23 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package conf
+package corekit
 
-import (
-	"github.com/kelseyhightower/envconfig"
-	"github.com/zeromicro/go-zero/core/conf"
-)
+import "time"
 
-// Load loads configuration from file.
-func Load(file string, v any, df func(v any), opts ...conf.Option) error {
-	if err := conf.Load(file, &v, opts...); err != nil {
-		return err
-	}
-	// Load configuration from environment variables.
-	if err := envconfig.Process("", &v); err != nil {
-		return err
-	}
-
-	df(&v)
-	return nil
+// UnixNano returns the Unix time, the number of nanoseconds elapsed since January 1, 1970 UTC.
+func UnixNano() float64 {
+	return float64(time.Now().UnixNano()) / 1e9
 }

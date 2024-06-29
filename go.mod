@@ -4,11 +4,13 @@ go 1.22.3
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+	github.com/deepauto-io/filestype v0.0.0-20231217053401-a7e90f2e6b3c
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.71
 	github.com/pkoukk/tiktoken-go v0.1.7
 	github.com/sashabaranov/go-openai v1.26.1
+	github.com/spf13/cast v1.6.0
 	github.com/zeromicro/go-zero v1.6.5
 	github.com/zeromicro/x v0.0.0-20240408115609-8224c482b07e
 	golang.org/x/image v0.18.0
@@ -23,7 +25,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
