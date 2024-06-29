@@ -146,7 +146,7 @@ func OpenaiWebConvertSonnet(r weboai.ChatCompletionRequest) (*BedrockRequest, er
 	}
 
 	if r.MaxTokens <= 0 {
-		req.MaxTokens = 1024
+		req.MaxTokens = 4096
 	}
 
 	if r.Temperature <= 0 {
@@ -156,7 +156,10 @@ func OpenaiWebConvertSonnet(r weboai.ChatCompletionRequest) (*BedrockRequest, er
 	for _, message := range r.Messages {
 		// system has two maybe has bug?
 		if message.Role == openai.ChatMessageRoleSystem {
-			req.System = message.Content
+			if message.Content != "" {
+				req.System = message.Content
+			}
+			continue
 		}
 
 		if len(message.Parts) != 0 {
@@ -181,11 +184,9 @@ func OpenaiWebConvertSonnet(r weboai.ChatCompletionRequest) (*BedrockRequest, er
 				Role:    message.Role,
 				Content: contents,
 			})
-			return req, nil
+			continue
 		}
-	}
 
-	for _, message := range r.Messages {
 		req.Messages = append(req.Messages, Message{
 			Role:    message.Role,
 			Content: message.Content,
