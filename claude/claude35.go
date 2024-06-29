@@ -47,7 +47,10 @@ func OpenaiConvertClaude(r openai.ChatCompletionRequest) *ClaudeRequest {
 	for _, message := range r.Messages {
 		if message.Role == "system" {
 			req.System = message.Content
+			continue
 		}
+
+		// handler files and content.
 		if len(message.Parts) != 0 {
 			var contents Contents
 			for _, part := range message.Parts {
@@ -70,11 +73,9 @@ func OpenaiConvertClaude(r openai.ChatCompletionRequest) *ClaudeRequest {
 				Role:    message.Role,
 				Content: contents,
 			})
-			return req
+			continue
 		}
-	}
 
-	for _, message := range r.Messages {
 		req.Messages = append(req.Messages, Message{
 			Role:    message.Role,
 			Content: message.Content,
