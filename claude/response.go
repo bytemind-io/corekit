@@ -17,8 +17,12 @@ limitations under the License.
 package claude
 
 import (
+	"time"
+
 	"github.com/bytemind-io/corekit"
 	"github.com/bytemind-io/corekit/openai"
+	"github.com/google/uuid"
+	sysopenai "github.com/sashabaranov/go-openai"
 )
 
 // ClaudeResponse is the response from the Claude service.
@@ -60,4 +64,29 @@ func (r *ClaudeResponse) OpenAIWeb(in *openai.ChatCompletionRequest) (list []ope
 		list = append(list, resp)
 	}
 	return
+}
+
+func (r *ClaudeResponse) Openai() sysopenai.ChatCompletionResponse {
+	return sysopenai.ChatCompletionResponse{
+		ID:      r.Id,
+		Object:  "chat.completion.chunk",
+		Created: time.Now().Unix(),
+		Model:   r.Model,
+		Choices: []sysopenai.ChatCompletionChoice{
+			{
+				Index: 0,
+				Message: sysopenai.ChatCompletionMessage{
+					Role:    sysopenai.ChatMessageRoleAssistant,
+					Content: r.Content[0].Text,
+				},
+				FinishReason: sysopenai.FinishReason(r.StopReason),
+			},
+		},
+		Usage: sysopenai.Usage{
+			PromptTokens:     0,
+			CompletionTokens: 0,
+			TotalTokens:      0,
+		},
+		SystemFingerprint: "fp_" + uuid.NewString(),
+	}
 }
