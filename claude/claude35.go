@@ -26,6 +26,7 @@ import (
 type ClaudeRequest struct {
 	Model             string      `json:"model"`
 	MaxTokens         int         `json:"max_tokens"`
+	System            string      `json:"system,omitempty"`
 	Messages          Messages    `json:"messages"`
 	Stream            bool        `json:"stream"`
 	Metadata          interface{} `json:"metadata,omitempty"`
