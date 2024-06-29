@@ -36,6 +36,7 @@ type ClaudeResponse struct {
 	Content      []Content   `json:"content,omitempty"`
 	StopReason   string      `json:"stop_reason"`
 	StopSequence interface{} `json:"stop_sequence"`
+	ContentBlock Content     `json:"content_block,omitempty"`
 }
 
 // OpenAIWeb opens the ClaudeResponse.
