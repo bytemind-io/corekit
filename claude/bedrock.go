@@ -19,6 +19,9 @@ package claude
 import (
 	"fmt"
 
+	"github.com/spf13/cast"
+
+	weboai "github.com/bytemind-io/corekit/openai"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -53,7 +56,7 @@ func OpenaiConvertSonnet(in openai.ChatCompletionRequest) (*BedrockRequest, erro
 	}
 
 	if in.Temperature <= 0 {
-		in.Temperature = 1.0
+		req.Temperature = 1.0
 	}
 
 	var (
@@ -125,6 +128,69 @@ func OpenaiConvertSonnet(in openai.ChatCompletionRequest) (*BedrockRequest, erro
 	}
 
 	req.Messages = msgs
+	return req, nil
+}
+
+// OpenaiWebConvertSonnet is the sonnet.TODO only use in Charlie W. Johnson.[将Openai网页数据抓换成Bedrock]
+func OpenaiWebConvertSonnet(r weboai.ChatCompletionRequest) (*BedrockRequest, error) {
+	version, ok := AnthropicVersion[r.Model]
+	if !ok {
+		return nil, fmt.Errorf("model %s not found.(Aws Anthropic Version)", r.Model)
+	}
+
+	req := &BedrockRequest{
+		AnthropicVersion: version,
+		MaxTokens:        r.MaxTokens,
+		Temperature:      r.Temperature,
+		TopP:             r.TopP,
+	}
+
+	if r.MaxTokens <= 0 {
+		req.MaxTokens = 1024
+	}
+
+	if r.Temperature <= 0 {
+		req.Temperature = 1.0
+	}
+
+	for _, message := range r.Messages {
+		// system has two maybe has bug?
+		if message.Role == openai.ChatMessageRoleSystem {
+			req.System = message.Content
+		}
+
+		if len(message.Parts) != 0 {
+			var contents Contents
+			for _, part := range message.Parts {
+				contents = append(contents, Content{
+					Type: "image",
+					Source: &Source{
+						Type:      "base64",
+						MediaType: part.MimeType,
+						Data:      part.ImageData,
+					},
+				})
+			}
+
+			contents = append(contents, Content{
+				Type: "text",
+				Text: cast.ToString(message.Content),
+			})
+
+			req.Messages = append(req.Messages, Message{
+				Role:    message.Role,
+				Content: contents,
+			})
+			return req, nil
+		}
+	}
+
+	for _, message := range r.Messages {
+		req.Messages = append(req.Messages, Message{
+			Role:    message.Role,
+			Content: message.Content,
+		})
+	}
 	return req, nil
 }
 
