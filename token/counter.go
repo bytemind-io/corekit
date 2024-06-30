@@ -134,7 +134,11 @@ func getTokenEncoder(model string) *tiktoken.Tiktoken {
 }
 
 // CalculateRequestToken calculates the chat token for the given model.[请求相关]
-func CalculateRequestToken(in openai.ChatCompletionRequest, model string) (int, error) {
+func CalculateRequestToken(in *openai.ChatCompletionRequest, model string) (int, error) {
+	if model == "" {
+		model = in.Model
+	}
+
 	tkm := 0
 	msgTokens, err := CalculateMessage(in.Messages, model)
 	if err != nil {
@@ -167,6 +171,19 @@ func CalculateRequestToken(in openai.ChatCompletionRequest, model string) (int, 
 		tkm += toolTokens
 	}
 	return tkm, nil
+}
+
+// CalculateResponseToken calculates the chat token for the given model.
+func CalculateResponseToken(out *openai.ChatCompletionResponse, model string) (int, error) {
+	if model == "" {
+		model = out.Model
+	}
+
+	messages := make([]openai.ChatCompletionMessage, 0)
+	for _, v := range out.Choices {
+		messages = append(messages, v.Message)
+	}
+	return CalculateMessage(messages, model)
 }
 
 // CalculateteMessage calculates the chat token for the given model.[消息Token计算]

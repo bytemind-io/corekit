@@ -17,6 +17,8 @@ limitations under the License.
 package claude
 
 import (
+	"github.com/bytemind-io/corekit/token"
+	"github.com/zeromicro/go-zero/core/logx"
 	"time"
 
 	"github.com/bytemind-io/corekit"
@@ -67,7 +69,7 @@ func (r *ClaudeResponse) OpenAIWeb(in *openai.ChatCompletionRequest) (list []ope
 	return
 }
 
-func (r *ClaudeResponse) Openai() sysopenai.ChatCompletionResponse {
+func (r *ClaudeResponse) Openai(in *openai.ChatCompletionRequest) sysopenai.ChatCompletionResponse {
 	req := sysopenai.ChatCompletionResponse{
 		ID:      r.Id,
 		Object:  "chat.completion.chunk",
@@ -86,9 +88,16 @@ func (r *ClaudeResponse) Openai() sysopenai.ChatCompletionResponse {
 		SystemFingerprint: "fp_" + uuid.NewString(),
 	}
 
-	// TODO add token cal
-	req.Usage.PromptTokens = 0
-	req.Usage.CompletionTokens = 0
-	req.Usage.TotalTokens = 0
+	promptTokens, err := in.CalculateRequestToken()
+	if err != nil {
+		logx.Error("CalculateRequestToken failed:", err.Error())
+	}
+	req.Usage.PromptTokens = promptTokens
+
+	req.Usage.CompletionTokens, err = token.CalculateResponseToken(&req, req.Model)
+	if err != nil {
+		logx.Error("CalculateResponseToken failed:", err.Error())
+	}
+	req.Usage.TotalTokens = promptTokens + req.Usage.CompletionTokens
 	return req
 }

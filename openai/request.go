@@ -18,6 +18,7 @@ package openai
 
 import (
 	"fmt"
+	"github.com/bytemind-io/corekit/token"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/sashabaranov/go-openai"
@@ -75,8 +76,47 @@ func (r *ChatCompletionRequest) Validate() error {
 	return nil
 }
 
+// MarshalToOpenaiCompletionRequest marshals to openai.ChatChatCompletionRequest
+func (r *ChatCompletionRequest) MarshalToOpenaiCompletionRequest() *openai.ChatCompletionRequest {
+	return &openai.ChatCompletionRequest{
+		Model:            r.Model,
+		Messages:         r.Messages.MarshalToCompletionMessage(),
+		MaxTokens:        r.MaxTokens,
+		Temperature:      r.Temperature,
+		TopP:             r.TopP,
+		N:                0, // todo
+		Stream:           r.Stream,
+		Stop:             nil, // todo
+		PresencePenalty:  0,   //todo
+		ResponseFormat:   nil,
+		Seed:             nil,
+		FrequencyPenalty: 0,
+		LogitBias:        nil,
+		LogProbs:         false,
+		TopLogProbs:      0,
+		User:             "",
+		Functions:        nil,
+		FunctionCall:     nil,
+		Tools:            nil,
+		ToolChoice:       nil,
+		StreamOptions:    nil,
+	}
+}
+
+func (r *ChatCompletionRequest) CalculateRequestToken() (int, error) {
+	return token.CalculateRequestToken(r.MarshalToOpenaiCompletionRequest(), "")
+}
+
 // ChatCompletionMessages is the messages for chat service.
 type ChatCompletionMessages []*ChatCompletionMessage
+
+func (m ChatCompletionMessages) MarshalToCompletionMessage() []openai.ChatCompletionMessage {
+	res := make([]openai.ChatCompletionMessage, 0, len(m))
+	for _, v := range m {
+		res = append(res, v.MarshalToCompletionMessage())
+	}
+	return res
+}
 
 // ChatCompletionMessage is the message for chat service.
 type ChatCompletionMessage struct {
@@ -87,8 +127,25 @@ type ChatCompletionMessage struct {
 	Parts       Parts       `json:"parts,omitempty"`
 }
 
+func (m ChatCompletionMessage) MarshalToCompletionMessage() openai.ChatCompletionMessage {
+	return openai.ChatCompletionMessage{
+		Role:         m.Role,
+		Content:      m.Content,
+		MultiContent: append(m.Parts.MarshalToOpenaiPart(), m.Attachments.MarshalToOpenaiPart()...),
+		Name:         m.Name,
+	}
+}
+
 // Parts is the parts for chat service.
 type Parts []Part
+
+func (p Parts) MarshalToOpenaiPart() []openai.ChatMessagePart {
+	res := make([]openai.ChatMessagePart, 0, len(p))
+	for _, v := range p {
+		res = append(res, v.MarshalToOpenaiPart())
+	}
+	return res
+}
 
 // Part is the part for chat service.
 type Part struct {
@@ -102,8 +159,25 @@ type Part struct {
 	OssUrl       string `json:"oss_url,omitempty"`
 }
 
+func (p Part) MarshalToOpenaiPart() openai.ChatMessagePart {
+	return openai.ChatMessagePart{
+		Type: openai.ChatMessagePartTypeImageURL,
+		ImageURL: &openai.ChatMessageImageURL{
+			URL: p.OssUrl,
+		},
+	}
+}
+
 // Attachments is the attachments for chat service.
 type Attachments []Attachment
+
+func (a Attachments) MarshalToOpenaiPart() []openai.ChatMessagePart {
+	res := make([]openai.ChatMessagePart, 0, len(a))
+	for _, v := range a {
+		res = append(res, v.MarshalToOpenaiPart())
+	}
+	return res
+}
 
 // Attachment is the attachment for chat service.
 type Attachment struct {
@@ -115,4 +189,12 @@ type Attachment struct {
 	Width         int    `json:"width,omitempty"`
 	Height        int    `json:"height,omitempty"`
 	OssUrl        string `json:"oss_url,omitempty"`
+}
+
+func (a Attachment) MarshalToOpenaiPart() openai.ChatMessagePart {
+	//todo read file
+	return openai.ChatMessagePart{
+		Type: openai.ChatMessagePartTypeText,
+		Text: "", //todo parse attachment
+	}
 }
