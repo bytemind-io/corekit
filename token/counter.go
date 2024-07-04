@@ -207,8 +207,6 @@ func CalculateStreamMessage(messages []openai.ChatCompletionStreamChoiceDelta, m
 			}
 		}
 	}
-
-	tokenNum += 3
 	return tokenNum, nil
 }
 
