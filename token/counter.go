@@ -188,17 +188,9 @@ func CalculateStreamResponseToken(out *openai.ChatCompletionStreamResponse, mode
 
 func CalculateStreamMessage(messages []openai.ChatCompletionStreamChoiceDelta, model string) (int, error) {
 	tokenEncoder := getTokenEncoder(model)
-	var tokensPerMessage int
-
-	if model == "gpt-3.5-turbo-0301" {
-		tokensPerMessage = 4
-	} else {
-		tokensPerMessage = 3
-	}
 
 	tokenNum := 0
 	for _, message := range messages {
-		tokenNum += tokensPerMessage
 		tokenNum += getTokenNum(tokenEncoder, message.Role)
 		if len(message.Content) > 0 {
 			if message.Content != "" {
@@ -207,6 +199,7 @@ func CalculateStreamMessage(messages []openai.ChatCompletionStreamChoiceDelta, m
 			}
 		}
 	}
+
 	return tokenNum, nil
 }
 
