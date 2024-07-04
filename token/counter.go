@@ -173,6 +173,45 @@ func CalculateRequestToken(in *openai.ChatCompletionRequest, model string) (int,
 	return tkm, nil
 }
 
+// CalculateStreamResponseToken calculates the chat token for the given model.
+func CalculateStreamResponseToken(out *openai.ChatCompletionStreamResponse, model string) (int, error) {
+	if model == "" {
+		model = out.Model
+	}
+
+	messages := make([]openai.ChatCompletionStreamChoiceDelta, 0)
+	for _, v := range out.Choices {
+		messages = append(messages, v.Delta)
+	}
+	return CalculateStreamMessage(messages, model)
+}
+
+func CalculateStreamMessage(messages []openai.ChatCompletionStreamChoiceDelta, model string) (int, error) {
+	tokenEncoder := getTokenEncoder(model)
+	var tokensPerMessage int
+
+	if model == "gpt-3.5-turbo-0301" {
+		tokensPerMessage = 4
+	} else {
+		tokensPerMessage = 3
+	}
+
+	tokenNum := 0
+	for _, message := range messages {
+		tokenNum += tokensPerMessage
+		tokenNum += getTokenNum(tokenEncoder, message.Role)
+		if len(message.Content) > 0 {
+			if message.Content != "" {
+				stringContent := message.Content
+				tokenNum += getTokenNum(tokenEncoder, stringContent)
+			}
+		}
+	}
+
+	tokenNum += 3
+	return tokenNum, nil
+}
+
 // CalculateResponseToken calculates the chat token for the given model.
 func CalculateResponseToken(out *openai.ChatCompletionResponse, model string) (int, error) {
 	if model == "" {
