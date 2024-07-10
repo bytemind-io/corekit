@@ -74,8 +74,6 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/zeromicro/go-zero v1.6.5 h1:JgsBa25/knnEL7+KQksbwktudIkNQvaAin0nisVgnSA=
 github.com/zeromicro/go-zero v1.6.5/go.mod h1:XjbssEVEzFKueAh0Fie5kNf+cRqFlQQk46fY9WgEGaM=
-github.com/zeromicro/x v0.0.0-20240408115609-8224c482b07e h1:F5waakzloTfbJg2lcO1xvrzO6ssn7jQ38lXIDBz+nbQ=
-github.com/zeromicro/x v0.0.0-20240408115609-8224c482b07e/go.mod h1:5TP11tc1RHPCi5C/KDL0kIB0KgJAb9FB3ChpT/qM/jA=
 go.opentelemetry.io/otel v1.19.0 h1:MuS/TNf4/j4IXsZuJegVzI1cwut7Qc00344rgH7p8bs=
 go.opentelemetry.io/otel v1.19.0/go.mod h1:i0QyjOq3UPoTzff0PJB2N66fb4S0+rSbSB15/oyH9fY=
 go.opentelemetry.io/otel/metric v1.19.0 h1:aTzpGtV0ar9wlV4Sna9sdJyII5jTVJEvKETPiOKwvpE=
