@@ -131,18 +131,9 @@ func logBrief(r *http.Request, code int, timer *utils.ElapsedTimer, logs *LogCol
 		logx.Field("request_path", r.RequestURI),
 		logx.Field("remote_ip", httpx.GetRemoteAddr(r)),
 		logx.Field("user_agent", r.UserAgent()),
+		logx.Field("duration", timex.ReprOfDuration(duration)),
+		logx.Field("dump_request", dumpRequest(r)),
 	)
-	if duration > slowThreshold.Load() {
-		logger = logger.WithFields(
-			logx.Field("status_code", wrapStatusCode(code)),
-			logx.Field("method", wrapMethod(r.Method)),
-			logx.Field("request_path", r.RequestURI),
-			logx.Field("remote_ip", httpx.GetRemoteAddr(r)),
-			logx.Field("user_agent", r.UserAgent()),
-			logx.Field("took", timex.ReprOfDuration(duration)),
-			logx.Field("slowcall", "slowcall"),
-		)
-	}
 
 	ok := isOkResponse(code)
 	if !ok {
