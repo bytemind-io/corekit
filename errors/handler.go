@@ -34,6 +34,12 @@ func StatusCodeToErrorCode(statusCode int) string {
 	return EInternal
 }
 
+// RegisterCustomStatusCode registers an error code with a status code.[注册错误码与状态码]
+func RegisterCustomStatusCode(code string, statusCode int) {
+	apiErrorToStatusCode[code] = statusCode
+	httpStatusCodeToError[statusCode] = code
+}
+
 // ErrorCodeToStatusCode maps an influxdb error code string to a
 // http status code integer.
 func ErrorCodeToStatusCode(ctx context.Context, code string) int {
@@ -91,6 +97,10 @@ func init() {
 //				Msg:  "model has not been found",
 //			})
 func Err(w http.ResponseWriter, r *http.Request, err error) {
+	if err == nil {
+		return
+	}
+
 	sd, ok := status.FromError(err)
 	if ok {
 		scode := StatusCodeToErrorCode(int(sd.Code()))
