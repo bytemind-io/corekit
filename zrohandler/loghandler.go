@@ -174,31 +174,13 @@ func logDetails(r *http.Request, response *detailLoggedResponseWriter, timer *ut
 		logx.Field("request_path", r.RequestURI),
 		logx.Field("remote_ip", httpx.GetRemoteAddr(r)),
 		logx.Field("user_agent", r.UserAgent()),
-		logx.Field("took", timex.ReprOfDuration(duration)),
+		logx.Field("duration", timex.ReprOfDuration(duration)),
 		logx.Field("dump_request", dumpRequest(r)),
 	)
-
-	if duration > defaultSlowThreshold {
-		logger = logger.WithFields(
-			logx.Field("status_code", wrapStatusCode(code)),
-			logx.Field("method", wrapMethod(r.Method)),
-			logx.Field("request_path", r.RequestURI),
-			logx.Field("remote_ip", httpx.GetRemoteAddr(r)),
-			logx.Field("user_agent", r.UserAgent()),
-			logx.Field("took", timex.ReprOfDuration(duration)),
-			logx.Field("dump_request", dumpRequest(r)),
-			logx.Field("slowcall", "slowcall"),
-		)
-	}
 
 	body := logs.Flush()
 	if len(body) > 0 {
 		buf.WriteString(fmt.Sprintf("%s\n", body))
-	}
-
-	respBuf := response.buf.Bytes()
-	if len(respBuf) > 0 {
-		buf.WriteString(fmt.Sprintf("<= %s", respBuf))
 	}
 
 	if isOkResponse(code) {
