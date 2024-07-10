@@ -132,7 +132,6 @@ func logBrief(r *http.Request, code int, timer *utils.ElapsedTimer, logs *LogCol
 		logx.Field("remote_ip", httpx.GetRemoteAddr(r)),
 		logx.Field("user_agent", r.UserAgent()),
 		logx.Field("duration", timex.ReprOfDuration(duration)),
-		logx.Field("dump_request", dumpRequest(r)),
 	)
 
 	ok := isOkResponse(code)
