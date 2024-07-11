@@ -34,7 +34,10 @@ type Redis struct {
 
 // NewRedis creates a new Redis instance.
 func NewRedis(c Config) (*Redis, error) {
-	r := &Redis{}
+	r := &Redis{
+		mutex: new(sync.Mutex),
+	}
+
 	if len(c.Address) == 1 {
 		r.single = redis.NewClient(
 			&redis.Options{
@@ -49,7 +52,6 @@ func NewRedis(c Config) (*Redis, error) {
 			return nil, err
 		}
 		r.clusterMode = false
-		r.mutex = new(sync.Mutex)
 		return r, nil
 	}
 
