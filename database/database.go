@@ -23,7 +23,6 @@ import (
 	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -56,8 +55,6 @@ func New(opt Config) (*SqlStore, error) {
 		db, err = gorm.Open(mysql.Open(opt.Database), gormCfg)
 	case "postgres":
 		db, err = gorm.Open(postgres.Open(opt.Database), gormCfg)
-	case "sqlite":
-		db, err = gorm.Open(sqlite.Open(opt.Database), gormCfg)
 	case "clickhouse":
 		db, err = gorm.Open(clickhouse.Open(opt.Database), gormCfg)
 	default:
