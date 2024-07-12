@@ -18,6 +18,7 @@ package redisdb
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -70,7 +71,6 @@ func NewRedis(c Config) (*Redis, error) {
 	return r, nil
 }
 
-// Client returns the redis client.
 func (r *Redis) Client() redis.UniversalClient {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
@@ -79,6 +79,213 @@ func (r *Redis) Client() redis.UniversalClient {
 		return r.cluster
 	}
 	return r.single
+}
+
+func (r *Redis) Set(ctx context.Context, k, v string, t time.Duration) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.Set(ctx, k, v, t).Err()
+	}
+	return r.single.Set(ctx, k, v, t).Err()
+}
+
+func (r *Redis) SGet(ctx context.Context, k string) interface{} {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.Get(ctx, k).Val()
+	}
+	return r.single.Get(ctx, k).Val()
+}
+
+func (r *Redis) HSet(ctx context.Context, k, field string, value interface{}) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.HSet(ctx, k, field, value).Err()
+	}
+	return r.single.HSet(ctx, k, field, value).Err()
+}
+
+func (r *Redis) HGet(ctx context.Context, k, field string) string {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.HGet(ctx, k, field).Val()
+	}
+	return r.single.HGet(ctx, k, field).Val()
+}
+
+func (r *Redis) HGetAll(ctx context.Context, k string) map[string]string {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.HGetAll(ctx, k).Val()
+	}
+	return r.single.HGetAll(ctx, k).Val()
+}
+
+func (r *Redis) HScan(ctx context.Context, k string, fn func(val string) error) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		iter := r.cluster.HScan(ctx, k, 0, "", 50).Iterator()
+		for iter.Next(ctx) {
+			fn(iter.Val())
+		}
+		return iter.Err()
+	}
+	iter := r.single.HScan(ctx, k, 0, "", 50).Iterator()
+	for iter.Next(ctx) {
+		fn(iter.Val())
+	}
+	return iter.Err()
+}
+
+func (r *Redis) HDel(ctx context.Context, k, field string) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.HDel(ctx, k, field).Err()
+	}
+	return r.single.HDel(ctx, k, field).Err()
+}
+
+func (r *Redis) Expire(ctx context.Context, k string, t time.Duration) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.Expire(ctx, k, t).Err()
+	}
+
+	return r.single.Expire(ctx, k, t).Err()
+}
+
+func (r *Redis) HSetTTL(ctx context.Context, k, field string, value interface{}, t time.Duration) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		if err := r.cluster.HSet(ctx, k, field, value).Err(); err != nil {
+			return err
+		}
+		return r.cluster.Expire(ctx, k, t).Err()
+	}
+	if err := r.single.HSet(ctx, k, field, value).Err(); err != nil {
+		return err
+	}
+	return r.single.Expire(ctx, k, t).Err()
+}
+
+func (r *Redis) Keys(ctx context.Context, k string) []string {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.Keys(ctx, k).Val()
+	}
+	return r.single.Keys(ctx, k).Val()
+}
+
+func (r *Redis) Del(ctx context.Context, k string) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.Del(ctx, k).Err()
+	}
+	return r.single.Del(ctx, k).Err()
+}
+
+func (r *Redis) Incr(ctx context.Context, k string) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.Incr(ctx, k).Err()
+	}
+	return r.single.Incr(ctx, k).Err()
+}
+
+func (r *Redis) BSet(ctx context.Context, k string, offset, value int64) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.SetBit(ctx, k, offset, int(value)).Err()
+	}
+	return r.single.SetBit(ctx, k, offset, int(value)).Err()
+}
+
+func (r *Redis) BGet(ctx context.Context, k string, offset int64) int64 {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.GetBit(ctx, k, offset).Val()
+	}
+	return r.single.GetBit(ctx, k, offset).Val()
+}
+
+func (r *Redis) BCount(ctx context.Context, k string, start, end int64) int64 {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	bc := &redis.BitCount{
+		Start: start,
+		End:   end,
+	}
+	if r.clusterMode {
+		return r.cluster.BitCount(ctx, k, bc).Val()
+	}
+	return r.single.BitCount(ctx, k, bc).Val()
+}
+
+func (r *Redis) Add(ctx context.Context, b, k, v []byte) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.HSet(ctx, string(b), string(k), v).Err()
+	}
+	return r.single.HSet(ctx, string(b), string(k), v).Err()
+}
+
+func (r *Redis) Delete(ctx context.Context, b, k []byte) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		return r.cluster.HDel(ctx, string(b), string(k)).Err()
+	}
+	return r.single.HDel(ctx, string(b), string(k)).Err()
+}
+
+func (r *Redis) Get(ctx context.Context, b, k []byte) ([]byte, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		resp := r.cluster.HGet(ctx, string(b), string(k)).Val()
+		if len(resp) == 0 {
+			return nil, fmt.Errorf("%s key not found", string(k))
+		}
+		return []byte(resp), nil
+	}
+	resp := r.single.HGet(ctx, string(b), string(k)).Val()
+	if len(resp) == 0 {
+		return nil, fmt.Errorf("%s key not found", string(k))
+	}
+	return []byte(resp), nil
+}
+
+func (r *Redis) All(ctx context.Context, k []byte) (interface{}, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.clusterMode {
+		resp := r.cluster.HGetAll(ctx, string(k)).Val()
+		if len(resp) == 0 {
+			return nil, fmt.Errorf("%s key not found", string(k))
+		}
+		return resp, nil
+	}
+	resp := r.single.HGetAll(ctx, string(k)).Val()
+	if len(resp) == 0 {
+		return nil, fmt.Errorf("%s key not found", string(k))
+	}
+	return resp, nil
 }
 
 // Start starts the underlying database.use in go-zero
