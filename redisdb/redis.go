@@ -19,7 +19,6 @@ package redisdb
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -29,15 +28,12 @@ import (
 type Redis struct {
 	cluster     *redis.ClusterClient
 	single      *redis.Client
-	mutex       *sync.Mutex
 	clusterMode bool
 }
 
 // NewRedis creates a new Redis instance.
 func NewRedis(c Config) (*Redis, error) {
-	r := &Redis{
-		mutex: new(sync.Mutex),
-	}
+	r := &Redis{}
 
 	if len(c.Address) == 1 {
 		r.single = redis.NewClient(
@@ -72,9 +68,6 @@ func NewRedis(c Config) (*Redis, error) {
 }
 
 func (r *Redis) Client() redis.UniversalClient {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
 	if r.clusterMode {
 		return r.cluster
 	}
@@ -82,8 +75,6 @@ func (r *Redis) Client() redis.UniversalClient {
 }
 
 func (r *Redis) Set(ctx context.Context, k, v string, t time.Duration) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.Set(ctx, k, v, t).Err()
 	}
@@ -91,8 +82,6 @@ func (r *Redis) Set(ctx context.Context, k, v string, t time.Duration) error {
 }
 
 func (r *Redis) SGet(ctx context.Context, k string) interface{} {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.Get(ctx, k).Val()
 	}
@@ -100,8 +89,6 @@ func (r *Redis) SGet(ctx context.Context, k string) interface{} {
 }
 
 func (r *Redis) HSet(ctx context.Context, k, field string, value interface{}) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.HSet(ctx, k, field, value).Err()
 	}
@@ -109,8 +96,6 @@ func (r *Redis) HSet(ctx context.Context, k, field string, value interface{}) er
 }
 
 func (r *Redis) HGet(ctx context.Context, k, field string) string {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.HGet(ctx, k, field).Val()
 	}
@@ -118,8 +103,6 @@ func (r *Redis) HGet(ctx context.Context, k, field string) string {
 }
 
 func (r *Redis) HGetAll(ctx context.Context, k string) map[string]string {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.HGetAll(ctx, k).Val()
 	}
@@ -127,8 +110,6 @@ func (r *Redis) HGetAll(ctx context.Context, k string) map[string]string {
 }
 
 func (r *Redis) HScan(ctx context.Context, k string, fn func(val string) error) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		iter := r.cluster.HScan(ctx, k, 0, "", 50).Iterator()
 		for iter.Next(ctx) {
@@ -144,8 +125,6 @@ func (r *Redis) HScan(ctx context.Context, k string, fn func(val string) error) 
 }
 
 func (r *Redis) HDel(ctx context.Context, k, field string) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.HDel(ctx, k, field).Err()
 	}
@@ -153,8 +132,6 @@ func (r *Redis) HDel(ctx context.Context, k, field string) error {
 }
 
 func (r *Redis) Expire(ctx context.Context, k string, t time.Duration) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.Expire(ctx, k, t).Err()
 	}
@@ -163,8 +140,6 @@ func (r *Redis) Expire(ctx context.Context, k string, t time.Duration) error {
 }
 
 func (r *Redis) HSetTTL(ctx context.Context, k, field string, value interface{}, t time.Duration) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		if err := r.cluster.HSet(ctx, k, field, value).Err(); err != nil {
 			return err
@@ -178,8 +153,6 @@ func (r *Redis) HSetTTL(ctx context.Context, k, field string, value interface{},
 }
 
 func (r *Redis) Keys(ctx context.Context, k string) []string {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.Keys(ctx, k).Val()
 	}
@@ -187,8 +160,6 @@ func (r *Redis) Keys(ctx context.Context, k string) []string {
 }
 
 func (r *Redis) Del(ctx context.Context, k string) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.Del(ctx, k).Err()
 	}
@@ -196,8 +167,6 @@ func (r *Redis) Del(ctx context.Context, k string) error {
 }
 
 func (r *Redis) Incr(ctx context.Context, k string) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.Incr(ctx, k).Err()
 	}
@@ -205,8 +174,6 @@ func (r *Redis) Incr(ctx context.Context, k string) error {
 }
 
 func (r *Redis) BSet(ctx context.Context, k string, offset, value int64) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.SetBit(ctx, k, offset, int(value)).Err()
 	}
@@ -214,8 +181,6 @@ func (r *Redis) BSet(ctx context.Context, k string, offset, value int64) error {
 }
 
 func (r *Redis) BGet(ctx context.Context, k string, offset int64) int64 {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.GetBit(ctx, k, offset).Val()
 	}
@@ -223,9 +188,6 @@ func (r *Redis) BGet(ctx context.Context, k string, offset int64) int64 {
 }
 
 func (r *Redis) BCount(ctx context.Context, k string, start, end int64) int64 {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
 	bc := &redis.BitCount{
 		Start: start,
 		End:   end,
@@ -237,8 +199,6 @@ func (r *Redis) BCount(ctx context.Context, k string, start, end int64) int64 {
 }
 
 func (r *Redis) Add(ctx context.Context, b, k, v []byte) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.HSet(ctx, string(b), string(k), v).Err()
 	}
@@ -246,8 +206,6 @@ func (r *Redis) Add(ctx context.Context, b, k, v []byte) error {
 }
 
 func (r *Redis) Delete(ctx context.Context, b, k []byte) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		return r.cluster.HDel(ctx, string(b), string(k)).Err()
 	}
@@ -255,8 +213,6 @@ func (r *Redis) Delete(ctx context.Context, b, k []byte) error {
 }
 
 func (r *Redis) Get(ctx context.Context, b, k []byte) ([]byte, error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		resp := r.cluster.HGet(ctx, string(b), string(k)).Val()
 		if len(resp) == 0 {
@@ -272,8 +228,6 @@ func (r *Redis) Get(ctx context.Context, b, k []byte) ([]byte, error) {
 }
 
 func (r *Redis) All(ctx context.Context, k []byte) (interface{}, error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
 	if r.clusterMode {
 		resp := r.cluster.HGetAll(ctx, string(k)).Val()
 		if len(resp) == 0 {
