@@ -247,8 +247,6 @@ func (s *Redis) Start() {}
 
 // Stop closes the underlying database.use in go-zero.
 func (s *Redis) Stop() {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
 	if s.clusterMode {
 		s.cluster.Close()
 		return
