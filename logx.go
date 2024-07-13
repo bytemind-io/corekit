@@ -18,6 +18,14 @@ package corekit
 
 import "github.com/zeromicro/go-zero/core/logx"
 
+// Config defines the logx configuration.
+type Config struct {
+	EnableStat  bool   `json:",optional,env=ENABLE_STAT,default=false"       envconfig:"ENABLE_STAT"              default:"false"`
+	ServiceName string `json:",optional,env=ZEROLOG_SERVICE_NAME"            envconfig:"ZEROLOG_SERVICE_NAME"`
+	LogLevel    string `json:",optional,env=ZEROLOG_LEVEL,default=info"      envconfig:"ZEROLOG_LEVEL"            default:"info"`
+	LogEncoding string `json:",optional,env=ZEROLOG_ENCODING,default=json"   envconfig:"ZEROLOG_ENCODING"         default:"json"`
+}
+
 // SetZeroLogx sets up logx with the given configuration.
 func SetZeroLogx(stat bool, name, level, encoding string) {
 	logx.SetUp(logx.LogConf{
