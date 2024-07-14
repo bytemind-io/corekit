@@ -44,15 +44,24 @@ const (
 type APIError struct {
 	Code           string `json:"code"`
 	Message        string `json:"message"`
+	Err            error  `json:"-"`
 	HTTPStatusCode int    `json:"-"`
 }
 
 // Error returns the error message.
 func (e *APIError) Error() string {
-	if e.HTTPStatusCode > 0 {
-		return fmt.Sprintf("error, status code: %d, message: %s", e.HTTPStatusCode, e.Message)
+	if e.Message != "" && e.Err != nil {
+		var b strings.Builder
+		b.WriteString(e.Message)
+		b.WriteString(": ")
+		b.WriteString(e.Err.Error())
+		return b.String()
+	} else if e.Message != "" {
+		return e.Message
+	} else if e.Err != nil {
+		return e.Err.Error()
 	}
-	return e.Message
+	return fmt.Sprintf("<%s>", e.Code)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.

@@ -18,10 +18,9 @@ package errors
 
 import (
 	"context"
-	"net/http"
-
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"google.golang.org/grpc/status"
+	"net/http"
 )
 
 // StatusCodeToErrorCode maps a http status code integer to an
@@ -122,7 +121,7 @@ func Err(w http.ResponseWriter, r *http.Request, err error) {
 		statusCode := ErrorCodeToStatusCode(r.Context(), vv.Code)
 		httpx.WriteJson(w, statusCode, APIError{
 			Code:           vv.Code,
-			Message:        vv.Message,
+			Message:        vv.Error(),
 			HTTPStatusCode: statusCode,
 		})
 		return
