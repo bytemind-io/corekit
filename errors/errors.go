@@ -61,6 +61,9 @@ func (e *APIError) Error() string {
 	} else if e.Err != nil {
 		return e.Err.Error()
 	}
+	if e.HTTPStatusCode > 0 {
+		return fmt.Sprintf("error, status code: %d, message: %s", e.HTTPStatusCode, e.Message)
+	}
 	return fmt.Sprintf("<%s>", e.Code)
 }
 
