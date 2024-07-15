@@ -13,6 +13,7 @@ require (
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/sashabaranov/go-openai v1.26.1
 	github.com/spf13/cast v1.6.0
+	github.com/stretchr/testify v1.9.0
 	github.com/zeromicro/go-zero v1.6.5
 	golang.org/x/image v0.18.0
 	google.golang.org/grpc v1.64.0
@@ -28,6 +29,7 @@ require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.17.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -52,6 +54,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect

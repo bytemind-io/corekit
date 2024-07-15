@@ -28,6 +28,13 @@ type Config struct {
 	DB       int      `json:",optional,env=REDIS_DB,default=0"                                  envconfig:"REDIS_DB"                  default:"0"`
 }
 
+func NewConfig() Config {
+	return Config{
+		Address:  []string{"127.0.0.1:36379"},
+		Password: "test-1",
+	}
+}
+
 // Validate validates the Config.
 func (c Config) Validate() error {
 	if len(c.Address) == 0 {
