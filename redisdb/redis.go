@@ -81,7 +81,7 @@ func (r *Redis) Set(ctx context.Context, k, v string, t time.Duration) error {
 	return r.single.Set(ctx, k, v, t).Err()
 }
 
-func (r *Redis) SGet(ctx context.Context, k string) interface{} {
+func (r *Redis) Get(ctx context.Context, k string) interface{} {
 	if r.clusterMode {
 		return r.cluster.Get(ctx, k).Val()
 	}
@@ -210,21 +210,6 @@ func (r *Redis) Delete(ctx context.Context, b, k []byte) error {
 		return r.cluster.HDel(ctx, string(b), string(k)).Err()
 	}
 	return r.single.HDel(ctx, string(b), string(k)).Err()
-}
-
-func (r *Redis) Get(ctx context.Context, b, k []byte) ([]byte, error) {
-	if r.clusterMode {
-		resp := r.cluster.HGet(ctx, string(b), string(k)).Val()
-		if len(resp) == 0 {
-			return nil, fmt.Errorf("%s key not found", string(k))
-		}
-		return []byte(resp), nil
-	}
-	resp := r.single.HGet(ctx, string(b), string(k)).Val()
-	if len(resp) == 0 {
-		return nil, fmt.Errorf("%s key not found", string(k))
-	}
-	return []byte(resp), nil
 }
 
 func (r *Redis) All(ctx context.Context, k []byte) (interface{}, error) {
