@@ -122,10 +122,11 @@ func (ll *logrusLogger) Writer() *io.PipeWriter {
 // New wraps a logrus Logger
 func New(l Level) Logger {
 	logger := &logrus.Logger{
-		Out:       os.Stderr,
-		Formatter: new(logrus.TextFormatter),
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.Level(l),
+		Out:          os.Stderr,
+		Formatter:    new(logrus.TextFormatter),
+		Hooks:        make(logrus.LevelHooks),
+		Level:        logrus.Level(l),
+		ReportCaller: true,
 	}
 
 	return &logrusLogger{
@@ -136,10 +137,11 @@ func New(l Level) Logger {
 // NewJ wraps a logrus Logger
 func NewJ(l Level) Logger {
 	logger := &logrus.Logger{
-		Out:       os.Stderr,
-		Formatter: new(logrus.JSONFormatter),
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.Level(l),
+		Out:          os.Stderr,
+		Formatter:    new(logrus.JSONFormatter),
+		Hooks:        make(logrus.LevelHooks),
+		Level:        logrus.Level(l),
+		ReportCaller: true,
 	}
 
 	return &logrusLogger{
@@ -150,10 +152,11 @@ func NewJ(l Level) Logger {
 // NewNop wraps a default logrus Logger
 func NewNop() Logger {
 	logger := &logrus.Logger{
-		Out:       os.Stderr,
-		Formatter: new(logrus.TextFormatter),
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.DebugLevel,
+		Out:          os.Stderr,
+		Formatter:    new(logrus.TextFormatter),
+		Hooks:        make(logrus.LevelHooks),
+		Level:        logrus.DebugLevel,
+		ReportCaller: true,
 	}
 
 	return &logrusLogger{
@@ -164,10 +167,11 @@ func NewNop() Logger {
 // NewJNop wraps a default logrus Logger
 func NewJNop() Logger {
 	logger := &logrus.Logger{
-		Out:       os.Stderr,
-		Formatter: new(logrus.JSONFormatter),
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.DebugLevel,
+		Out:          os.Stderr,
+		Formatter:    new(logrus.JSONFormatter),
+		Hooks:        make(logrus.LevelHooks),
+		Level:        logrus.DebugLevel,
+		ReportCaller: true,
 	}
 
 	return &logrusLogger{
