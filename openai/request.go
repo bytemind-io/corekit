@@ -84,10 +84,10 @@ func (r *ChatCompletionRequest) MarshalToOpenaiCompletionRequest() *openai.ChatC
 		MaxTokens:        r.MaxTokens,
 		Temperature:      r.Temperature,
 		TopP:             r.TopP,
-		N:                0, // todo
+		N:                0,
 		Stream:           r.Stream,
-		Stop:             nil, // todo
-		PresencePenalty:  0,   //todo
+		Stop:             nil,
+		PresencePenalty:  0,
 		ResponseFormat:   nil,
 		Seed:             nil,
 		FrequencyPenalty: 0,
