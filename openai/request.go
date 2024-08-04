@@ -76,11 +76,10 @@ func (r *ChatCompletionRequest) Validate() error {
 	return nil
 }
 
-// MarshalToOpenaiCompletionRequest marshals to openai.ChatChatCompletionRequest
-func (r *ChatCompletionRequest) MarshalToOpenaiCompletionRequest() *openai.ChatCompletionRequest {
-	return &openai.ChatCompletionRequest{
+// OpenAI marshals to openai.ChatChatCompletionRequest
+func (r *ChatCompletionRequest) OpenAI() *openai.ChatCompletionRequest {
+	req := &openai.ChatCompletionRequest{
 		Model:            r.Model,
-		Messages:         r.Messages.MarshalToCompletionMessage(),
 		MaxTokens:        r.MaxTokens,
 		Temperature:      r.Temperature,
 		TopP:             r.TopP,
@@ -101,19 +100,24 @@ func (r *ChatCompletionRequest) MarshalToOpenaiCompletionRequest() *openai.ChatC
 		ToolChoice:       nil,
 		StreamOptions:    nil,
 	}
+
+	if r.Messages != nil {
+		req.Messages = r.Messages.Marshal()
+	}
+	return req
 }
 
 func (r *ChatCompletionRequest) CalculateRequestToken() (int, error) {
-	return token.CalculateRequestToken(r.MarshalToOpenaiCompletionRequest(), "")
+	return token.CalculateRequestToken(r.OpenAI(), "")
 }
 
 // ChatCompletionMessages is the messages for chat service.
 type ChatCompletionMessages []*ChatCompletionMessage
 
-func (m ChatCompletionMessages) MarshalToCompletionMessage() []openai.ChatCompletionMessage {
+func (m ChatCompletionMessages) Marshal() []openai.ChatCompletionMessage {
 	res := make([]openai.ChatCompletionMessage, 0, len(m))
 	for _, v := range m {
-		res = append(res, v.MarshalToCompletionMessage())
+		res = append(res, v.Marshal())
 	}
 	return res
 }
@@ -127,11 +131,11 @@ type ChatCompletionMessage struct {
 	Parts       Parts       `json:"parts,omitempty"`
 }
 
-func (m ChatCompletionMessage) MarshalToCompletionMessage() openai.ChatCompletionMessage {
+func (m ChatCompletionMessage) Marshal() openai.ChatCompletionMessage {
 	return openai.ChatCompletionMessage{
 		Role:         m.Role,
 		Content:      m.Content,
-		MultiContent: append(m.Parts.MarshalToOpenaiPart(), m.Attachments.MarshalToOpenaiPart()...),
+		MultiContent: append(m.Parts.Marshal(), m.Attachments.Marshal()...),
 		Name:         m.Name,
 	}
 }
@@ -139,7 +143,7 @@ func (m ChatCompletionMessage) MarshalToCompletionMessage() openai.ChatCompletio
 // Parts is the parts for chat service.
 type Parts []Part
 
-func (p Parts) MarshalToOpenaiPart() []openai.ChatMessagePart {
+func (p Parts) Marshal() []openai.ChatMessagePart {
 	res := make([]openai.ChatMessagePart, 0, len(p))
 	for _, v := range p {
 		res = append(res, v.MarshalToOpenaiPart())
@@ -171,7 +175,7 @@ func (p Part) MarshalToOpenaiPart() openai.ChatMessagePart {
 // Attachments is the attachments for chat service.
 type Attachments []Attachment
 
-func (a Attachments) MarshalToOpenaiPart() []openai.ChatMessagePart {
+func (a Attachments) Marshal() []openai.ChatMessagePart {
 	res := make([]openai.ChatMessagePart, 0, len(a))
 	for _, v := range a {
 		res = append(res, v.MarshalToOpenaiPart())
@@ -192,9 +196,8 @@ type Attachment struct {
 }
 
 func (a Attachment) MarshalToOpenaiPart() openai.ChatMessagePart {
-	//todo read file
 	return openai.ChatMessagePart{
 		Type: openai.ChatMessagePartTypeText,
-		Text: "", //todo parse attachment
+		Text: "",
 	}
 }
