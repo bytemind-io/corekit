@@ -227,6 +227,13 @@ func (r *Redis) All(ctx context.Context, k []byte) (interface{}, error) {
 	return resp, nil
 }
 
+func (r *Redis) LPush(ctx context.Context, k, f string) error {
+	if r.clusterMode {
+		return r.cluster.LPush(ctx, k, f).Err()
+	}
+	return r.single.LPush(ctx, k, f).Err()
+}
+
 // Start starts the underlying database.use in go-zero
 func (s *Redis) Start() {}
 
