@@ -26,7 +26,7 @@ import (
 type UploadRequest struct {
 	ConversationId string                `form:"conversation_id"`
 	UploadType     string                `form:"upload_type"`
-	File           *multipart.FileHeader `form:"files"`
+	File           *multipart.FileHeader `form:"file"`
 }
 
 func (r *UploadRequest) Validate() error {
