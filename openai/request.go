@@ -24,6 +24,19 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+// ConversationV4Request represents the request for the conversation endpoint
+type ConversationV4Request struct {
+	GizmoId                    string      `json:"gizmo_id,omitempty"`
+	Message                    string      `json:"message"`
+	ParentMessageID            string      `json:"parent_message_id,omitempty"`
+	ConversationID             string      `json:"conversation_id,omitempty"`
+	Stream                     bool        `json:"stream,omitempty"`
+	Model                      string      `json:"model"`
+	Attachments                Attachments `json:"attachments,omitempty"`
+	Parts                      Parts       `json:"parts,omitempty"`
+	HistoryAndTrainingDisabled bool        `json:"history_and_training_disabled,omitempty"`
+}
+
 // ChatCompletionRequest represents the request for the conversation endpoint
 type ChatCompletionRequest struct {
 	GizmoId                    string                 `json:"gizmo_id"`
