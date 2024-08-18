@@ -18,6 +18,23 @@ package openai
 
 import "encoding/json"
 
+type ChatCodeResponseV4 struct {
+	Created        int           `json:"created"`
+	MessageID      string        `json:"message_id"`
+	ConversationID string        `json:"conversation_id"`
+	EndTurn        bool          `json:"end_turn"`
+	Confirm        bool          `json:"confirm,omitempty"`
+	Contents       []interface{} `json:"contents"`
+	Downloads      []string      `json:"downloads,omitempty"`
+	Usage          Usage         `json:"usage,omitempty"`
+}
+
+type Usage struct {
+	PromptTokens     int `json:"prompt_tokens"`
+	CompletionTokens int `json:"completion_tokens"`
+	TotalTokens      int `json:"total_tokens"`
+}
+
 // ChatCompletionResponse represents the response of the ChatCompletion API.
 type ChatCompletionResponse struct {
 	ConversationID string              `json:"conversation_id"`
