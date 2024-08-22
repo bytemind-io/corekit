@@ -63,6 +63,12 @@ func DecodeUrlImage(url string) (image.Config, string, error) {
 	return image.Config{}, "", err
 }
 
+// GetImageConfig gets the image type and base64 encoded data.
+func GetImageConfig(imageBytes []byte) (image.Config, string, error) {
+	reader := bytes.NewReader(imageBytes)
+	return getImageConfig(reader)
+}
+
 // DecodeBase64Image decodes a base64 image string.
 func DecodeBase64Image(base64String string) (image.Config, string, string, error) {
 	if idx := strings.Index(base64String, ","); idx != -1 {

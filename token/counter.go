@@ -267,6 +267,33 @@ func CalculateMessage(messages []openai.ChatCompletionMessage, model string) (in
 	return tokenNum, nil
 }
 
+// CalculateImageBytesToken calculates the chat token for the given image bytes.[计算图片Token]
+func CalculateImageBytesToken(imageBytes []byte, model string) (int, error) {
+	if model == "glm-4v" {
+		return 1047, nil
+	}
+
+	config, _, err := corekit.GetImageConfig(imageBytes)
+	if err != nil {
+		return 0, err
+	}
+
+	shortSide := config.Width
+	otherSide := config.Height
+	scale := 1.0
+	if config.Height < shortSide {
+		shortSide = config.Height
+		otherSide = config.Width
+	}
+	if shortSide > 768 {
+		scale = float64(shortSide) / 768
+		shortSide = 768
+	}
+	otherSide = int(math.Ceil(float64(otherSide) / scale))
+	tiles := (shortSide + 511) / 512 * ((otherSide + 511) / 512)
+	return tiles*170 + 85, nil
+}
+
 // CalculateImageToken gets the token number for the given image URL.[计算图片Token]
 func CalculateImageToken(imageUrl *openai.ChatMessageImageURL, model string) (int, error) {
 	if model == "glm-4v" {
