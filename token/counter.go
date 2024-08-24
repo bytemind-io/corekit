@@ -191,7 +191,6 @@ func CalculateStreamMessage(messages []openai.ChatCompletionStreamChoiceDelta, m
 
 	tokenNum := 0
 	for _, message := range messages {
-		tokenNum += getTokenNum(tokenEncoder, message.Role)
 		if len(message.Content) > 0 {
 			if message.Content != "" {
 				stringContent := message.Content
