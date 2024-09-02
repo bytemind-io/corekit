@@ -24,7 +24,7 @@ import (
 // Config is the configuration for the redisdb.
 type Config struct {
 	Address  []string `json:",optional,env=REDIS_ADDRESS,default=127.0.0.1:6379"                envconfig:"REDIS_ADDRESS"             default:"127.0.0.1:6379"` // redis 集群地址
-	Password string   `json:",optional,env=REDIS_ADDRESS"                                       envconfig:"REDIS_PASSWORD"`                                     // openssl rand -base64 12
+	Password string   `json:",optional,env=REDIS_PASSWORD"                                       envconfig:"REDIS_PASSWORD"`                                    // openssl rand -base64 12
 	DB       int      `json:",optional,env=REDIS_DB,default=0"                                  envconfig:"REDIS_DB"                  default:"0"`
 }
 
