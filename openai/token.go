@@ -33,6 +33,7 @@ func CalculateCustomResponseToken(model string, out ...ChatCompletionResponse) (
 	}
 
 	text := ""
+	imageList := make([]string, 0)
 	for _, v := range out {
 		// If the response is text or code, attach the response content.
 		switch v.Message.Content.ContentType {
@@ -45,10 +46,7 @@ func CalculateCustomResponseToken(model string, out ...ChatCompletionResponse) (
 		case ContentTypeCode, ContentTypeExecutionOutput:
 			text += v.Message.Content.Text
 		}
-	}
 
-	imageList := make([]string, 0)
-	for _, v := range out {
 		if len(v.Downloads) != 0 {
 			for _, list := range v.Downloads {
 				for _, url := range list {
