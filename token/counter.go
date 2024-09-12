@@ -19,8 +19,6 @@ package token
 import (
 	"encoding/json"
 	"fmt"
-	customOpenai "github.com/bytemind-io/corekit/openai"
-	"github.com/spf13/cast"
 	"image"
 	"math"
 	"strings"
@@ -215,63 +213,6 @@ func CalculateResponseToken(out *openai.ChatCompletionResponse, model string) (i
 		messages = append(messages, v.Message)
 	}
 	return CalculateMessage(messages, model)
-}
-
-// CalculateCustomResponseToken calculates custom response token for the given model.
-func CalculateCustomResponseToken(model string, out ...customOpenai.ChatCompletionResponse) (int, error) {
-	if len(out) == 0 {
-		return 0, nil
-	}
-
-	if model == "" {
-		model = out[0].Model
-	}
-
-	text := ""
-	for _, v := range out {
-		// If the response is text or code, attach the response content.
-		switch v.Message.Content.ContentType {
-		case customOpenai.ContentTypeText:
-			if len(v.Message.Content.Parts) > 0 && v.Message.Author.Role != customOpenai.ContentTypeText {
-				for _, part := range v.Message.Content.Parts {
-					text += cast.ToString(part)
-				}
-			}
-		case customOpenai.ContentTypeCode, customOpenai.ContentTypeExecutionOutput:
-			text += v.Message.Content.Text
-		}
-	}
-
-	imageList := make([]string, 0)
-	for _, v := range out {
-		if len(v.Downloads) != 0 {
-			for _, list := range v.Downloads {
-				for _, url := range list {
-					imageList = append(imageList, url)
-				}
-			}
-		}
-	}
-
-	tokenNum := 0
-	if text != "" {
-		num, err := CalculateTextToken(text, model)
-		if err != nil {
-			return 0, err
-		}
-		tokenNum += num
-	}
-
-	for _, url := range imageList {
-		num, err := CalculateImageToken(&openai.ChatMessageImageURL{URL: url}, model)
-		if err != nil {
-			return 0, err
-		}
-		tokenNum += num
-	}
-
-	return tokenNum, nil
-
 }
 
 // CalculateteMessage calculates the chat token for the given model.[消息Token计算]
