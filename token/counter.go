@@ -218,7 +218,7 @@ func CalculateResponseToken(out *openai.ChatCompletionResponse, model string) (i
 }
 
 // CalculateCustomResponseToken calculates custom response token for the given model.
-func CalculateCustomResponseToken(model string, out ...*customOpenai.ChatCompletionResponse) (int, error) {
+func CalculateCustomResponseToken(model string, out ...customOpenai.ChatCompletionResponse) (int, error) {
 	if len(out) == 0 {
 		return 0, nil
 	}
