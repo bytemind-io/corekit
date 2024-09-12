@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	customOpenai "github.com/bytemind-io/corekit/openai"
+	"github.com/spf13/cast"
 	"image"
 	"math"
 	"strings"
@@ -230,6 +231,9 @@ func CalculateCustomResponseToken(model string, out ...*customOpenai.ChatComplet
 	for _, v := range out {
 		if v.Message.Content.ContentType == customOpenai.ContentTypeText {
 			text += v.Message.Content.Text
+			for _, part := range v.Message.Content.Parts {
+				text += cast.ToString(part)
+			}
 		}
 	}
 
