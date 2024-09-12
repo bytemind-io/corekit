@@ -229,11 +229,16 @@ func CalculateCustomResponseToken(model string, out ...customOpenai.ChatCompleti
 
 	text := ""
 	for _, v := range out {
-		if v.Message.Content.ContentType == customOpenai.ContentTypeText {
-			text += v.Message.Content.Text
-			for _, part := range v.Message.Content.Parts {
-				text += cast.ToString(part)
+		// If the response is text or code, attach the response content.
+		switch v.Message.Content.ContentType {
+		case customOpenai.ContentTypeText:
+			if len(v.Message.Content.Parts) > 0 && v.Message.Author.Role != customOpenai.ContentTypeText {
+				for _, part := range v.Message.Content.Parts {
+					text += cast.ToString(part)
+				}
 			}
+		case customOpenai.ContentTypeCode, customOpenai.ContentTypeExecutionOutput:
+			text += v.Message.Content.Text
 		}
 	}
 

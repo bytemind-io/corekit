@@ -17,6 +17,15 @@ limitations under the License.
 package openai
 
 const (
-	ContentTypeText       = "text"
-	ContentTypeMultimodal = "multimodal_text"
+	ContentTypeText            = "text"
+	ContentTypeCode            = "code"
+	ContentTypeMultimodal      = "multimodal_text"
+	ContentTypeExecutionOutput = "execution_output"
+)
+
+const (
+	RoleSystem    = "system"
+	RoleUser      = "user"
+	RoleAssistant = "assistant"
+	RoleTool      = "tool"
 )
