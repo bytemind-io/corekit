@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redsync/redsync/v4"
-	"github.com/go-redsync/redsync/v4/redis/goredis/v7"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
 	"time"
 
 	"github.com/redis/go-redis/v9"
