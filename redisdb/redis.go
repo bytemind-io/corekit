@@ -19,6 +19,8 @@ package redisdb
 import (
 	"context"
 	"fmt"
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v7"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -72,6 +74,13 @@ func (r *Redis) Client() redis.UniversalClient {
 		return r.cluster
 	}
 	return r.single
+}
+
+func (r *Redis) RedSync() *redsync.Redsync {
+	if r.clusterMode {
+		return redsync.New(goredis.NewPool(r.cluster))
+	}
+	return redsync.New(goredis.NewPool(r.single))
 }
 
 func (r *Redis) Set(ctx context.Context, k, v string, t time.Duration) error {
