@@ -100,3 +100,25 @@ func getImageConfig(reader io.Reader) (image.Config, string, error) {
 	}
 	return config, format, nil
 }
+
+// ImageToBase64 downloads an image from the given URL and returns its Base64 encoding
+func ImageToBase64(imageURL string) (string, error) {
+	resp, err := http.Get(imageURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("failed to fetch image: %s", resp.Status)
+	}
+
+	imgData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	base64Str := base64.StdEncoding.EncodeToString(imgData)
+
+	return base64Str, nil
+}
