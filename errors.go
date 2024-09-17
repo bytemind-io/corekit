@@ -17,9 +17,21 @@ limitations under the License.
 package corekit
 
 import (
+	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"net/http"
 )
+
+// Err creates a new error with a given code and message.
+func Err(ctx *gin.Context, err error) {
+	var apiErr *openai.APIError
+	if errors.As(err, &apiErr) {
+		ctx.JSON(apiErr.HTTPStatusCode, apiErr)
+	} else {
+		ctx.JSON(500, NewInError(500, err))
+	}
+}
 
 // NewInError creates a new error with a given code and message.
 func NewInError(code int, err error) *openai.APIError {
