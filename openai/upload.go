@@ -45,11 +45,11 @@ type UploadResponse struct {
 	ID             string `json:"id"`
 	Name           string `json:"name"`
 	Size           int64  `json:"size"`
-	DownloadUrl    string `json:"download_url"`
-	ImageWidth     int    `json:"image_width"`
-	ImageHeight    int    `json:"image_height"`
-	UseCase        string `json:"use_case"`
+	DownloadUrl    string `json:"download_url,omitempty"`
+	ImageWidth     int    `json:"image_width,omitempty"`
+	ImageHeight    int    `json:"image_height,omitempty"`
+	UseCase        string `json:"use_case,omitempty"`
 	FileTokenSize  int    `json:"fileTokenSize,omitempty"`
 	MimeType       string `json:"mimeType"`
-	ConversationId string `json:"conversation_id"`
+	ConversationId string `json:"conversation_id,omitempty"`
 }
