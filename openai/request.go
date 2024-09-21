@@ -145,25 +145,32 @@ type ChatCompletionMessage struct {
 }
 
 func (m ChatCompletionMessage) Marshal() openai.ChatCompletionMessage {
-	var contents []openai.ChatMessagePart
+	if len(m.Parts) != 0 {
+		var contents []openai.ChatMessagePart
 
-	if len(m.Content) != 0 {
-		contents = append(contents, openai.ChatMessagePart{
-			Type: openai.ChatMessagePartTypeText,
-			Text: m.Content,
-		})
+		if len(m.Content) != 0 {
+			contents = append(contents, openai.ChatMessagePart{
+				Type: openai.ChatMessagePartTypeText,
+				Text: m.Content,
+			})
+		}
 
 		contents = append(contents, m.Parts.Marshal()...)
 		if len(m.Attachments) != 0 {
 			// TODO 需要移除！ 目前文件上传|几乎所有厂家都不支持
 			//contents = append(contents, m.Attachments.Marshal()...)
 		}
+		return openai.ChatCompletionMessage{
+			Role:         m.Role,
+			Content:      m.Content,
+			MultiContent: contents,
+			Name:         m.Name,
+		}
 	}
 	return openai.ChatCompletionMessage{
-		Role:         m.Role,
-		Content:      m.Content,
-		MultiContent: contents,
-		Name:         m.Name,
+		Role:    m.Role,
+		Content: m.Content,
+		Name:    m.Name,
 	}
 }
 
