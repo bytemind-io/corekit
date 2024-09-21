@@ -38,7 +38,7 @@ type Usage struct {
 // ChatCompletionResponse represents the response of the ChatCompletion API.
 type ChatCompletionResponse struct {
 	ConversationID string              `json:"conversation_id"`
-	Error          interface{}         `json:"error"`
+	Error          interface{}         `json:"error,omitempty"`
 	Message        Message             `json:"message,omitempty"`
 	Downloads      []map[string]string `json:"downloads,omitempty"`
 	Model          string              `json:"model"`
