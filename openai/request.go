@@ -162,7 +162,6 @@ func (m ChatCompletionMessage) Marshal() openai.ChatCompletionMessage {
 		}
 		return openai.ChatCompletionMessage{
 			Role:         m.Role,
-			Content:      m.Content,
 			MultiContent: contents,
 			Name:         m.Name,
 		}
