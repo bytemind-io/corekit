@@ -27,6 +27,7 @@ type UploadRequest struct {
 	ConversationId string                `form:"conversation_id"`
 	UploadType     string                `form:"upload_type"`
 	File           *multipart.FileHeader `form:"files"`
+	Model          string                `form:"model"`
 }
 
 func (r *UploadRequest) Validate() error {
