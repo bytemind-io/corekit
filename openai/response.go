@@ -45,6 +45,15 @@ type ChatCompletionResponse struct {
 	Stop           bool                `json:"stop"`
 }
 
+// ReverseWebCompletionActionResponse represents the response of the ReverseWebCompletionAction API.
+type ReverseWebCompletionActionResponse struct {
+	ConversationId string                   `json:"conversation_id"`
+	MessageId      string                   `json:"message_id"`
+	EndTurn        bool                     `json:"end_turn"`
+	Created        int64                    `json:"created"`
+	Contents       []ChatCompletionResponse `json:"contents"`
+}
+
 // Marshal returns the JSON encoding of ChatCompletionResponse.
 func (c ChatCompletionResponse) Marshal() []byte {
 	body, _ := json.Marshal(c)
