@@ -54,3 +54,13 @@ type UploadResponse struct {
 	MimeType       string `json:"mimeType"`
 	ConversationId string `json:"conversation_id,omitempty"`
 }
+
+// UploadResponseV2 is the response for uploading a file [Reverse OpenAI uploaded response].
+type UploadResponseV2 struct {
+	// ConversationID is the conversation id.
+	ConversationID string `json:"conversation_id"`
+	// Attachment is the attachment.
+	Attachment *Attachment `json:"attachment"`
+	// Part is the part.
+	Part *Part `json:"part"`
+}
